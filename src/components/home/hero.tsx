@@ -12,21 +12,23 @@ export function Hero() {
             Pan-African Enterprise Automation Studio
           </div>
           <h1 className="mt-6 font-display text-5xl font-bold leading-[1.05] sm:text-6xl lg:text-7xl">
-            Systems <span className="text-gradient-brand">Reimagined</span>
+            SYSTEMS <span className="text-gradient-brand">REIMAGINED.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
-            We analyze legacy operational bottlenecks and engineer fluid, fully automated
-            enterprise ecosystems. Transition from manual workflows to intelligent digital
-            infrastructure — custom ERP, school management platforms, industrial digitization
-            and bespoke automation built for African enterprises.
+          <p className="mt-6 max-w-xl text-base text-foreground/90 sm:text-lg font-medium">
+            We turn manual, spreadsheet-heavy operations into powerful, automated digital systems.
+          </p>
+          <p className="mt-4 max-w-xl text-sm text-muted-foreground sm:text-base leading-relaxed">
+            Stop wrestling with fragmented workflows and outdated tools. We analyze your unique
+            business processes, design custom software solutions and build interactive dashboards
+            that run your operations automatically — owned by you, no monthly SaaS fees.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link to="/contact" className="group inline-flex items-center gap-2 rounded-md bg-brand px-5 py-3 text-sm font-semibold text-brand-foreground shadow-glow transition-transform hover:scale-[1.02]">
-              Consult with a Systems Engineer
+            <a href="#audit" className="group inline-flex items-center gap-2 rounded-md bg-brand px-5 py-3 text-sm font-semibold text-brand-foreground shadow-glow transition-transform hover:scale-[1.02]">
+              Reimagine Your System Today
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
+            </a>
             <Link to="/solutions" className="inline-flex items-center gap-2 rounded-md border border-border bg-card/60 px-5 py-3 text-sm font-semibold backdrop-blur hover:bg-accent">
-              Explore the Core Engine
+              Explore Solutions
             </Link>
           </div>
           <dl className="mt-12 grid grid-cols-3 gap-4 max-w-md">
@@ -43,7 +45,25 @@ export function Hero() {
           </dl>
         </div>
 
-        <PipelineVisualizer />
+        <div className="relative">
+          <PipelineVisualizer />
+          <div className="pointer-events-none absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-success/40 bg-card/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-success backdrop-blur">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-success" />
+            Live
+          </div>
+          <div className="pointer-events-none absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-2">
+            {[
+              { k: "+38%", v: "Throughput" },
+              { k: "99.8%", v: "Accuracy" },
+              { k: "0", v: "Manual entry" },
+            ].map((s) => (
+              <div key={s.v} className="rounded-lg border border-border/80 bg-card/85 p-2 backdrop-blur">
+                <p className="font-display text-sm font-bold text-brand">{s.k}</p>
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{s.v}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
