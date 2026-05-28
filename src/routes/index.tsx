@@ -8,6 +8,7 @@ import { IndustryBlueprint } from "@/components/home/industry-blueprint";
 import { SolutionsSuite } from "@/components/home/solutions-suite";
 import { Integrations } from "@/components/home/integrations";
 import { GrowthPromise } from "@/components/home/growth-promise";
+import { CaseStudies } from "@/components/home/case-studies";
 import { Architects } from "@/components/home/architects";
 import { AuditForm } from "@/components/home/audit-form";
 import { Toaster } from "@/components/ui/sonner";
@@ -38,6 +39,7 @@ function Home() {
       <IndustryBlueprint />
       <SolutionsSuite />
       <Integrations />
+      <CaseStudies />
       <GrowthPromise />
       <Architects />
       <AuditForm />
