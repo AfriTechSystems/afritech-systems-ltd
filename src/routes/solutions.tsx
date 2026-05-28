@@ -42,7 +42,7 @@ const SOLUTIONS = [
 export const Route = createFileRoute("/solutions")({
   head: () => ({
     meta: [
-      { title: "Enterprise Solutions — Custom ERP, School Management, Industrial Logistics | AfriTech Systems" },
+      { title: "Solutions — ERP, School Management & Logistics" },
       { name: "description", content: "Custom ERP systems, automated school management platforms and industrial logistics engines engineered by AfriTech Systems for enterprises across Africa." },
       { property: "og:title", content: "AfriTech Solutions — ERP, School Management, Industrial Logistics" },
       { property: "og:description", content: "Three core engines, infinite configurations. Built for African enterprises by AfriTech Systems." },

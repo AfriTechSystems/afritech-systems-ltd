@@ -1,0 +1,14 @@
+# AfriTech Systems Limited
+
+> Pan-African enterprise automation studio building custom ERP, school management and industrial digitization systems for organizations across Africa.
+
+AfriTech Systems Limited is a PACRA-registered Zambian firm headquartered in Lusaka. We replace manual, spreadsheet-heavy operations with owned, audit-grade digital infrastructure — eliminating recurring SaaS fees for our clients.
+
+## Pages
+
+- [Home](/): Systems Reimagined — overview of our automation engines and approach.
+- [Solutions](/solutions): Custom ERP, automated school management and industrial logistics platforms.
+- [Industries](/industries): Sector blueprints for pharma, public sector, logistics, manufacturing and academia.
+- [Integrations](/integrations): Tools and platforms our systems connect with.
+- [About](/about): Mission, team and company background.
+- [Contact](/contact): Request a free digital systems audit.
