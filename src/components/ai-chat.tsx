@@ -176,8 +176,8 @@ export function AiChatWidget() {
             className="flex items-center gap-2 border-t border-border bg-card p-3"
           >
             <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
               placeholder="Ask about our solutions…"
               className="h-10 flex-1 bg-background text-sm"
               disabled={isLoading}
@@ -185,7 +185,7 @@ export function AiChatWidget() {
             <Button
               type="submit"
               size="icon"
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || !inputValue.trim()}
               className="h-10 w-10 shrink-0 bg-brand text-brand-foreground hover:bg-brand/90"
             >
               {isLoading ? (
