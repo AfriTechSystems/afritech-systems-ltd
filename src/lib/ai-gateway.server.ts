@@ -27,6 +27,8 @@ export function createLovableAiGatewayProvider(lovableApiKey: string, initialRun
     baseURL: "https://ai.gateway.lovable.dev/v1",
     headers: {
       "Lovable-API-Key": lovableApiKey,
+      "X-Lovable-AIG-SDK": "vercel-ai-sdk",
+    },
     fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
       const headers = new Headers(init?.headers);
       if (runId && !headers.has(LOVABLE_AIG_RUN_ID_HEADER)) {
