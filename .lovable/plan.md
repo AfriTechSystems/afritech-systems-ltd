@@ -1,57 +1,57 @@
-## Afri Tech Systems Limited — Website Plan
+# Plan — Content Expansion, Light-Mode Default, Mobile Type Scaling
 
-A high-end, SEO-rich corporate site with the brand's teal/cyan + deep slate palette (from the logo), N8N-inspired dark aesthetic with smooth dark→light theme toggle, and interactive sections that feel like an operating system for enterprise transformation.
+## 1. Default theme → Light
+- `src/components/theme-toggle.tsx`: default `isDark = false`; honour stored preference, otherwise light.
+- `src/routes/__root.tsx`: update the pre-hydration script so the `dark` class is added ONLY when `localStorage.theme === "dark"` (currently defaults to dark). Prevents flash.
+- Quick visual pass on hero/dashboard SVGs to ensure they read on a light background (tweak a few opacity/stroke tokens via existing semantic CSS variables — no hard-coded colors).
 
-### Brand & Theme
-- **Primary palette** (from logo): deep slate `#0F1B2D`, brand teal `#2DD4BF` / cyan `#22D3EE`, emerald accent `#10B981`, neutral slate text
-- **Default mode**: dark (N8N-style gradient backgrounds with subtle grid + glow). Light mode toggleable via header switch, persisted in localStorage
-- All colors as semantic tokens in `src/styles.css` (oklch); no hardcoded colors in components
-- Typography: Space Grotesk (headings) + Inter (body)
-- Glassmorphism nav (sticky, blurred), hardware-accelerated transitions
+## 2. Hero rewrite (`src/components/home/hero.tsx`)
+- New H1: "SYSTEMS REIMAGINED." with subhead "We turn manual, spreadsheet-heavy operations into powerful, automated digital systems."
+- New body paragraph from brief.
+- Primary CTA "Reimagine Your System Today" → scrolls to `#audit`. Secondary "Explore Solutions" → `/solutions`.
+- Keep the existing animated pipeline SVG on the right (it already matches the "spreadsheet → dashboard" metaphor); add a small "LIVE" pill + 3 mini KPI tiles overlay to make it read more like a dashboard.
 
-### Site Structure (TanStack Router file-based routes)
-```
-/                  Home (all 6 hero sections from brief)
-/solutions         Deep dive: ERP, School Management, Industrial Logistics
-/industries        Expanded industry matrix with schematics
-/about             Company story + PACRA registration + Mwando & Julius
-/integrations     Automation stack logos (n8n, Zapier, Make, Supabase, etc.)
-/contact           Full "Initiate Digital Audit" lead form
-/sitemap.xml       Dynamic sitemap server route
-```
-Each route gets its own `head()` with unique title, description, og:title, og:description. `robots.txt` + JSON-LD Organization on root.
+## 3. New section: "From Complexity to Clarity in Three Steps"
+- New component `src/components/home/three-steps.tsx` inserted between Hero and the existing TransformationCanvas.
+- Three numbered cards (01 Process Auditing, 02 Custom Architecture, 03 Automation & Dashboards) with icons (lucide: Search, Boxes, LineChart), connecting line on desktop, stacked on mobile.
 
-### Home Page Sections
-1. **Hero** — "Systems Reimagined" H1, subtitle, dual CTAs. Right side: animated SVG showing legacy Excel grid morphing into glowing data packets flowing to a cloud node (pure CSS/SVG, hardware accelerated)
-2. **Transformation Canvas** — Tabbed Before/Bottleneck vs After/Automaton with animated metric counters and color shift (red→green)
-3. **Core Engine Showcase** — Mock dashboard with left sidebar (ERP / School Mgmt / Industrial Logistics), main panel with animated SVG KPI charts (Tasks Liquidated, Efficiency, Visibility, Uptime)
-4. **Industry Blueprint** — Click-to-expand cards (Pharma, Public Sector, Logistics, Manufacturing, Academia) each revealing a micro-schematic data-flow SVG
-5. **Integrations Marquee** — Auto-scrolling logo strip of automation tools (n8n, Zapier, Make, Supabase, PostgreSQL, Slack, Microsoft 365, Jira, Google Workspace, WhatsApp Business, Twilio, Stripe) — like the Lovable/N8N integrations section
-6. **Architects** — Cards for Mwando Hamwenda (CTO) and Julius Masiwa (CFO) with focus descriptions; PACRA Lusaka footnote
-7. **Initiate Digital Audit** — Multi-step form: current engine → metric to optimize → name/email/phone, with validation + focus animations
-8. **Footer** — Contact (enquiry@afritechsystemsltd.com, +260 969071139, +260 973655569), Lusaka HQ, Pan-African reach, nav, social, sitemap link
+## 4. New section: "Industry Matrix" (replace text-only table with rich cards)
+- New component `src/components/home/industry-matrix.tsx` placed before the existing IndustryBlueprint.
+- Five expandable cards (Pharma, Education, Enterprise/Holding, Government, Logistics) each with: what we replace, the reimagined solution, business value — full copy from brief.
+- Each card gets a generated sector "mini dashboard" SVG illustration (pure inline SVG using design tokens — no external images, since none were actually attached to the message).
 
-### Theme Toggle
-- Sun/moon icon in nav, class-based on `<html>`, no flash on load (ScriptOnce pre-hydration)
+## 5. New section: "Featured Solutions Suite"
+- New component `src/components/home/solutions-suite.tsx` after the matrix.
+- Three feature blocks (ERP, School Management, Automated Operations & Data Pipelines) with key-feature bullet lists from the brief.
+- Also surface the same component on `/solutions` route to enrich that page.
 
-### SEO
-- Per-route `head()` with keyword-dense titles/descriptions ("Enterprise Automation Zambia", "Custom ERP Africa", "School Management Platform Pan-Africa", "Industrial Digitization", etc.)
-- Semantic HTML throughout (header/main/section/article/footer)
-- JSON-LD Organization (root) + LocalBusiness/ContactPoint on contact
-- Dynamic `/sitemap.xml` server route, `public/robots.txt`
-- Relative canonicals (domain to be wired when deployed); og:url uses afritechsystemsltd.com once confirmed
+## 6. New section: "Built for Growth, Backed by Performance"
+- New component `src/components/home/growth-promise.tsx` before Architects.
+- Pull quote ("Systems Reimagined isn't just our tagline…") + 3 trust pillars (Intuitive Visual UX, Bulletproof Data Security, Actionable Business Intelligence).
 
-### Technical Details
-- TanStack Start with file-based routes under `src/routes/`
-- Logo copied to `src/assets/afritech-logo.png`
-- Shared `<SiteHeader>` (glass nav + theme toggle) and `<SiteFooter>` in `__root.tsx`
-- Form is frontend-only (no backend yet) — submissions trigger a success toast; Lovable Cloud can be enabled later for persistence/email
-- All interactive sections use Tailwind transitions + transform/opacity (GPU accelerated)
-- Mobile-first responsive, all sections collapse gracefully
+## 7. Lead-capture form upgrade (`src/components/home/audit-form.tsx`)
+- Convert step 3 to a single consolidated form matching the brief:
+  - Full Name
+  - Company Name / Industry (one combined field, free text)
+  - Corporate Email
+  - **Dropdown** "Main operational bottleneck": Spreadsheets / Paperwork / Disconnected Apps / Other
+  - **Dropdown** "How can we help?": Build custom ERP / School Management / Automation pipeline / Industry-specific platform / Not sure — please advise
+  - Optional message textarea
+- Keep step 1 (current engine) + step 2 (metric to optimize) as the "guided" intro; add a new copy block above the form: "stop paying monthly SaaS fees — own a custom in-house system."
+- Update Zod schema accordingly; keep frontend-only submission (success toast) per current scope.
+- New header text "Ready to Eliminate Operational Chaos?" + button label "Request Free Systems Audit".
 
-### Out of Scope (can add later)
-- Actual form submission backend (needs Lovable Cloud + email integration)
-- Real OG image generation
-- Blog/case studies CMS
+## 8. Mobile typography reduction (≈ 1/3 smaller on small screens)
+- Single source of truth in `src/styles.css`: add a `@media (max-width: 640px)` block that scales root `font-size` and overrides Tailwind heading utility sizes (`h1, h2, h3, .font-display`, etc.) to ~66 % of current. This avoids editing every component.
+- Verify hero/section headlines still read well; tighten line-height to compensate.
 
-Once you approve, I'll build everything in one pass.
+## 9. SEO / meta touch-ups
+- Update `src/routes/index.tsx` `head()` description + keywords meta to include: Custom Software Development Africa, Process Automation Solutions Zambia, ERP Software, School Management Systems, Digital Transformation Services, Corporate Dashboard Systems, Business Intelligence Integration, Spreadsheet Automation Solutions.
+- No new routes; canonical stays on leaves only.
+
+## Note on images
+Your message references "attached images / image designs I had in mind" but no image files actually came through — only Pinterest search descriptions. I'll generate clean inline-SVG sector illustrations + dashboard mockups using the brand palette so the look stays unified. If you'd rather I generate raster hero/sector images with the image generator (or you re-upload yours), say the word and I'll add that as a follow-up step.
+
+## Out of scope (this round)
+- Real form submission backend (still toast-only — Lovable Cloud wiring is the recommended next step after this).
+- New routes; this is homepage + `/solutions` content enrichment only.
