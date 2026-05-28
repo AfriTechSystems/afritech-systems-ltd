@@ -6,8 +6,8 @@ import { SITE } from "@/lib/site";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About AfriTech Systems — PACRA-registered Enterprise Automation in Lusaka, Zambia" },
-      { name: "description", content: "AfriTech Systems Limited is a PACRA-registered Zambian enterprise automation firm engineering custom ERP, school management and industrial digitization for clients across Pan-Africa." },
+      { title: "About AfriTech Systems — Lusaka, Zambia" },
+      { name: "description", content: "PACRA-registered Zambian automation studio building custom ERP, school management and industrial systems for Pan-African enterprises." },
       { property: "og:title", content: "About — AfriTech Systems Limited" },
       { property: "og:description", content: "Pan-African enterprise automation studio headquartered in Lusaka, Zambia." },
       { property: "og:url", content: "/about" },

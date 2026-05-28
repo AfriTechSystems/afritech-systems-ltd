@@ -15,8 +15,8 @@ import { Toaster } from "@/components/ui/sonner";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AfriTech Systems — Systems Reimagined | Enterprise Automation in Africa" },
-      { name: "description", content: "AfriTech Systems Limited turns manual, spreadsheet-heavy operations into automated digital systems — custom ERP, school management, industrial logistics & corporate dashboards for African enterprises." },
+      { title: "AfriTech Systems — Enterprise Automation in Africa" },
+      { name: "description", content: "Turn spreadsheet-heavy operations into automated digital systems. Custom ERP, school management and industrial dashboards for African enterprises." },
       { name: "keywords", content: "Custom Software Development Africa, Process Automation Solutions Zambia, Enterprise Resource Planning Software, School Management Systems, Digital Transformation Services, Corporate Dashboard Systems, Business Intelligence Integration, Spreadsheet Automation Solutions" },
       { property: "og:title", content: "AfriTech Systems — Systems Reimagined" },
       { property: "og:description", content: "Custom ERP, school management, industrial digitization & corporate dashboards. Own your systems — no monthly SaaS fees." },

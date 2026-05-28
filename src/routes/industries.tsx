@@ -5,8 +5,8 @@ import { IndustryBlueprint } from "@/components/home/industry-blueprint";
 export const Route = createFileRoute("/industries")({
   head: () => ({
     meta: [
-      { title: "Industries We Digitize — Pharma, Public Sector, Logistics, Manufacturing, Academia | AfriTech Systems" },
-      { name: "description", content: "AfriTech Systems digitizes pharmaceuticals, public sector, logistics, commercial manufacturing and academic infrastructure across Pan-Africa with bespoke automation." },
+      { title: "Industries — Pharma, Public Sector, Logistics & More" },
+      { name: "description", content: "Sector-specific automation for pharmaceuticals, public sector, logistics, manufacturing and academia across Pan-Africa." },
       { property: "og:title", content: "Industries — AfriTech Systems" },
       { property: "og:description", content: "Sector-specific automation blueprints engineered for African enterprises." },
       { property: "og:url", content: "/industries" },
