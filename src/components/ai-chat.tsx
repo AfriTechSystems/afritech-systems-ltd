@@ -19,9 +19,10 @@ const chatTransport = new DefaultChatTransport({ api: "/api/chat" });
 
 export function AiChatWidget() {
   const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status, input, setInput } = useChat({
+  const { messages, sendMessage, status } = useChat({
     transport: chatTransport,
     id: "afritech-assistant",
   });
@@ -33,6 +34,13 @@ export function AiChatWidget() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim() || isLoading) return;
+    sendMessage({ text: inputValue.trim() });
+    setInputValue("");
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
