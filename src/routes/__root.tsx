@@ -70,6 +70,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Custom ERP, school management and industrial automation for Pan-African enterprises." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2e485fea-58fc-4b4f-8006-08e16aab7dd8/id-preview-eb9fa8de--466ac3f1-4c54-41f1-b221-db2be7166b47.lovable.app-1779979497286.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2e485fea-58fc-4b4f-8006-08e16aab7dd8/id-preview-eb9fa8de--466ac3f1-4c54-41f1-b221-db2be7166b47.lovable.app-1779979497286.png" },
+      { title: "Lovable App" },
+      { property: "og:title", content: "Lovable App" },
+      { name: "twitter:title", content: "Lovable App" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
