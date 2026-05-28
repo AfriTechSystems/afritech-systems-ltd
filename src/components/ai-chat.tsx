@@ -42,13 +42,6 @@ export function AiChatWidget() {
     setInputValue("");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-    sendMessage({ text: input.trim() });
-    setInput("");
-  };
-
   return (
     <>
       {/* Floating toggle button */}
