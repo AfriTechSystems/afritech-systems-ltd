@@ -15,17 +15,6 @@ const HELP_OPTIONS = [
   "Not sure — please advise",
 ] as const;
 
-const schema = z.object({
-  engine: z.string().min(1, "Select your current engine"),
-  metric: z.string().min(1, "Select a metric to optimize"),
-  name: z.string().trim().min(2, "Name is required").max(120),
-  company: z.string().trim().min(2, "Company name is required").max(160),
-  email: z.string().trim().email("Enter a valid corporate email").max(255),
-  bottleneck: z.string().min(1, "Select your main bottleneck"),
-  help: z.string().min(1, "Select how we can help"),
-  message: z.string().trim().max(1000).optional(),
-});
-
 export function AuditForm() {
   const [step, setStep] = useState(0);
   const [data, setData] = useState({
@@ -42,8 +31,12 @@ export function AuditForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function next() {
-    if (step === 0 && !data.engine) return setErrors({ engine: "Select your current engine" });
-    if (step === 1 && !data.metric) return setErrors({ metric: "Select a metric to optimize" });
+    setErrors({});
+    setStep((s) => s + 1);
+  }
+  function skip() {
+    if (step === 0) setData({ ...data, engine: "" });
+    if (step === 1) setData({ ...data, metric: "" });
     setErrors({});
     setStep((s) => s + 1);
   }
@@ -51,7 +44,16 @@ export function AuditForm() {
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = schema.safeParse(data);
+    // Step 1 + 2 are optional, only contact details are required.
+    const contactSchema = z.object({
+      name: z.string().trim().min(2, "Name is required").max(120),
+      company: z.string().trim().min(2, "Company name is required").max(160),
+      email: z.string().trim().email("Enter a valid email").max(255),
+      bottleneck: z.string().min(1, "Pick the main problem"),
+      help: z.string().min(1, "Pick how we can help"),
+      message: z.string().trim().max(1000).optional(),
+    });
+    const parsed = contactSchema.safeParse(data);
     if (!parsed.success) {
       const fe: Record<string, string> = {};
       parsed.error.issues.forEach((i) => { fe[i.path[0] as string] = i.message; });
@@ -59,7 +61,7 @@ export function AuditForm() {
       return;
     }
     setDone(true);
-    toast.success("Free systems audit requested", { description: "A systems engineer will reach out within one business day." });
+    toast.success("Audit request received", { description: "We'll reply within one business day." });
   }
 
   if (done) {
@@ -161,19 +163,26 @@ export function AuditForm() {
             </Step>
           )}
 
-          <div className="mt-8 flex items-center justify-between">
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
             <button type="button" onClick={back} disabled={step === 0} className="rounded-md px-4 py-2 text-sm text-muted-foreground disabled:opacity-40 hover:text-foreground">
               Back
             </button>
-            {step < 2 ? (
-              <button type="button" onClick={next} className="inline-flex items-center gap-2 rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-brand-foreground shadow-glow transition-transform hover:scale-[1.02]">
-                Continue <ArrowRight className="h-4 w-4" />
-              </button>
-            ) : (
-              <button type="submit" className="inline-flex items-center gap-2 rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-brand-foreground shadow-glow transition-transform hover:scale-[1.02]">
-                Request Free Systems Audit <ArrowRight className="h-4 w-4" />
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {step < 2 && (
+                <button type="button" onClick={skip} className="rounded-md px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
+                  Skip
+                </button>
+              )}
+              {step < 2 ? (
+                <button type="button" onClick={next} className="inline-flex items-center gap-2 rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-brand-foreground shadow-glow transition-transform hover:scale-[1.02]">
+                  Continue <ArrowRight className="h-4 w-4" />
+                </button>
+              ) : (
+                <button type="submit" className="inline-flex items-center gap-2 rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-brand-foreground shadow-glow transition-transform hover:scale-[1.02]">
+                  Send my request <ArrowRight className="h-4 w-4" />
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </div>
