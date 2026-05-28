@@ -1,5 +1,4 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import type { FetchFunction } from "@ai-sdk/provider";
 
 const LOVABLE_AIG_RUN_ID_HEADER = "X-Lovable-AIG-Run-ID";
 
