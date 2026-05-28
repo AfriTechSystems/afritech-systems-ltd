@@ -15,17 +15,6 @@ const HELP_OPTIONS = [
   "Not sure — please advise",
 ] as const;
 
-const schema = z.object({
-  engine: z.string().min(1, "Select your current engine"),
-  metric: z.string().min(1, "Select a metric to optimize"),
-  name: z.string().trim().min(2, "Name is required").max(120),
-  company: z.string().trim().min(2, "Company name is required").max(160),
-  email: z.string().trim().email("Enter a valid corporate email").max(255),
-  bottleneck: z.string().min(1, "Select your main bottleneck"),
-  help: z.string().min(1, "Select how we can help"),
-  message: z.string().trim().max(1000).optional(),
-});
-
 export function AuditForm() {
   const [step, setStep] = useState(0);
   const [data, setData] = useState({
