@@ -190,3 +190,17 @@
   .animate-marquee { animation: marquee 40s linear infinite; }
   .animate-pulse-stream { animation: pulse-stream 2s ease-in-out infinite; }
 }
+
+/* Mobile typography scale-down (~66% of desktop sizes per design brief) */
+@media (max-width: 640px) {
+  html { font-size: 13px; }
+  h1, .text-5xl, .text-6xl, .text-7xl { font-size: 2rem !important; line-height: 1.15 !important; }
+  h2, .text-4xl { font-size: 1.5rem !important; line-height: 1.2 !important; }
+  h3, .text-3xl { font-size: 1.25rem !important; line-height: 1.25 !important; }
+  .text-2xl { font-size: 1.05rem !important; }
+  .text-xl { font-size: 0.95rem !important; }
+  .text-lg { font-size: 0.9rem !important; }
+  p, li, label, span, a, button, input, select, textarea { font-size: 0.78rem; }
+  .text-sm { font-size: 0.72rem !important; }
+  .text-xs { font-size: 0.62rem !important; }
+}

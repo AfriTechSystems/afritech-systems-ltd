@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, GraduationCap, Truck, ArrowRight, CheckCircle2 } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
+import { SolutionsSuite } from "@/components/home/solutions-suite";
 
 const SOLUTIONS = [
   {
@@ -60,6 +61,8 @@ function Solutions() {
         title="Three engines. One reimagined operating system."
         description="Every AfriTech deployment combines our three core platforms into a unified digital infrastructure — sized for your sector, branded for your organization, integrated with the tools you already run."
       />
+
+      <SolutionsSuite />
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-8">

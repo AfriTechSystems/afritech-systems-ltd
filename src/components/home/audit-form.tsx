@@ -6,18 +6,38 @@ import { SITE } from "@/lib/site";
 
 const ENGINES = ["Legacy Excel Workbooks", "Fragmented Local Software", "Manual Paper Operations", "Mixed / Other"] as const;
 const METRICS = ["Operational Cost", "Executive Tracking", "Data Accuracy", "Speed of Execution"] as const;
+const BOTTLENECKS = ["Spreadsheets", "Paperwork", "Disconnected Apps", "Other"] as const;
+const HELP_OPTIONS = [
+  "Build a custom ERP system",
+  "Build a School Management platform",
+  "Build automation & data pipelines",
+  "Build an industry-specific platform",
+  "Not sure — please advise",
+] as const;
 
 const schema = z.object({
   engine: z.string().min(1, "Select your current engine"),
   metric: z.string().min(1, "Select a metric to optimize"),
   name: z.string().trim().min(2, "Name is required").max(120),
-  email: z.string().trim().email("Enter a valid enterprise email").max(255),
-  phone: z.string().trim().min(7, "Enter a valid phone number").max(32),
+  company: z.string().trim().min(2, "Company name is required").max(160),
+  email: z.string().trim().email("Enter a valid corporate email").max(255),
+  bottleneck: z.string().min(1, "Select your main bottleneck"),
+  help: z.string().min(1, "Select how we can help"),
+  message: z.string().trim().max(1000).optional(),
 });
 
 export function AuditForm() {
   const [step, setStep] = useState(0);
-  const [data, setData] = useState({ engine: "", metric: "", name: "", email: "", phone: "" });
+  const [data, setData] = useState({
+    engine: "",
+    metric: "",
+    name: "",
+    company: "",
+    email: "",
+    bottleneck: "",
+    help: "",
+    message: "",
+  });
   const [done, setDone] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -39,7 +59,7 @@ export function AuditForm() {
       return;
     }
     setDone(true);
-    toast.success("Digital audit request received", { description: "Our systems engineer will reach out within one business day." });
+    toast.success("Free systems audit requested", { description: "A systems engineer will reach out within one business day." });
   }
 
   if (done) {
@@ -67,10 +87,14 @@ export function AuditForm() {
     <section id="audit" className="border-t border-border/60 bg-radial-glow py-20 sm:py-28">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <header className="text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-brand">Initiate Digital Audit</p>
-          <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">A conversation, not a contact form</h2>
+          <p className="text-sm font-semibold uppercase tracking-wider text-brand">Free Systems Audit</p>
+          <h2 className="mt-3 font-display text-4xl font-bold sm:text-5xl">
+            Ready to eliminate operational chaos?
+          </h2>
           <p className="mt-4 text-muted-foreground">
-            Three questions. One actionable transformation blueprint, free of charge.
+            Let's explore how your current manual processes can be digitized and automated into
+            high-performance infrastructure — owned outright by your company, with no monthly SaaS
+            fees draining revenue.
           </p>
         </header>
 
@@ -110,13 +134,28 @@ export function AuditForm() {
             <Step title="Where should our systems engineer reach you?">
               <div className="grid gap-4">
                 <Field label="Full name" error={errors.name}>
-                  <input value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} className="field" placeholder="Jane Mubita" autoComplete="name" />
+                  <input value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} className="field" placeholder="Jane Mubita" autoComplete="name" maxLength={120} />
                 </Field>
-                <Field label="Enterprise email" error={errors.email}>
-                  <input type="email" value={data.email} onChange={(e) => setData({ ...data, email: e.target.value })} className="field" placeholder="jane@company.com" autoComplete="email" />
+                <Field label="Company name / Industry" error={errors.company}>
+                  <input value={data.company} onChange={(e) => setData({ ...data, company: e.target.value })} className="field" placeholder="Acme Holdings — Manufacturing" autoComplete="organization" maxLength={160} />
                 </Field>
-                <Field label="Phone number" error={errors.phone}>
-                  <input type="tel" value={data.phone} onChange={(e) => setData({ ...data, phone: e.target.value })} className="field" placeholder="+260 ..." autoComplete="tel" />
+                <Field label="Corporate email address" error={errors.email}>
+                  <input type="email" value={data.email} onChange={(e) => setData({ ...data, email: e.target.value })} className="field" placeholder="jane@company.com" autoComplete="email" maxLength={255} />
+                </Field>
+                <Field label="Main operational bottleneck" error={errors.bottleneck}>
+                  <select value={data.bottleneck} onChange={(e) => setData({ ...data, bottleneck: e.target.value })} className="field">
+                    <option value="">Select your biggest blocker…</option>
+                    {BOTTLENECKS.map((b) => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                </Field>
+                <Field label="How can we help?" error={errors.help}>
+                  <select value={data.help} onChange={(e) => setData({ ...data, help: e.target.value })} className="field">
+                    <option value="">Select the system you need…</option>
+                    {HELP_OPTIONS.map((h) => <option key={h} value={h}>{h}</option>)}
+                  </select>
+                </Field>
+                <Field label="Anything else we should know? (optional)" error={errors.message}>
+                  <textarea value={data.message} onChange={(e) => setData({ ...data, message: e.target.value })} className="field min-h-24" placeholder="Briefly describe your current setup, team size or revenue impact you're targeting." maxLength={1000} />
                 </Field>
               </div>
             </Step>
@@ -132,7 +171,7 @@ export function AuditForm() {
               </button>
             ) : (
               <button type="submit" className="inline-flex items-center gap-2 rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-brand-foreground shadow-glow transition-transform hover:scale-[1.02]">
-                Initiate audit <ArrowRight className="h-4 w-4" />
+                Request Free Systems Audit <ArrowRight className="h-4 w-4" />
               </button>
             )}
           </div>
