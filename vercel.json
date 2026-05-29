@@ -1,10 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/:path((?!.*\\..*).*)",
-      "destination": "/index.html"
-    }
-  ]
+  "framework": "tanstack-start",
+  "buildCommand": "vite build --config vite.vercel.config.ts",
+  "outputDirectory": ".vercel/output"
 }
