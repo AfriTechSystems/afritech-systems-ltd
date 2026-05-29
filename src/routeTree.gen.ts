@@ -17,6 +17,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as ApiAuditLeadRouteImport } from './routes/api/audit-lead'
 
 const SolutionsRoute = SolutionsRouteImport.update({
   id: '/solutions',
@@ -58,6 +59,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuditLeadRoute = ApiAuditLeadRouteImport.update({
+  id: '/api/audit-lead',
+  path: '/api/audit-lead',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/integrations': typeof IntegrationsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions': typeof SolutionsRoute
+  '/api/audit-lead': typeof ApiAuditLeadRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/integrations': typeof IntegrationsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions': typeof SolutionsRoute
+  '/api/audit-lead': typeof ApiAuditLeadRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/integrations': typeof IntegrationsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions': typeof SolutionsRoute
+  '/api/audit-lead': typeof ApiAuditLeadRoute
   '/api/chat': typeof ApiChatRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/sitemap.xml'
     | '/solutions'
+    | '/api/audit-lead'
     | '/api/chat'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/sitemap.xml'
     | '/solutions'
+    | '/api/audit-lead'
     | '/api/chat'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/sitemap.xml'
     | '/solutions'
+    | '/api/audit-lead'
     | '/api/chat'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   IntegrationsRoute: typeof IntegrationsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SolutionsRoute: typeof SolutionsRoute
+  ApiAuditLeadRoute: typeof ApiAuditLeadRoute
   ApiChatRoute: typeof ApiChatRoute
 }
 
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/audit-lead': {
+      id: '/api/audit-lead'
+      path: '/api/audit-lead'
+      fullPath: '/api/audit-lead'
+      preLoaderRoute: typeof ApiAuditLeadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrationsRoute: IntegrationsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SolutionsRoute: SolutionsRoute,
+  ApiAuditLeadRoute: ApiAuditLeadRoute,
   ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport

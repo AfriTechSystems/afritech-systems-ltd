@@ -42,9 +42,8 @@ export function AuditForm() {
   }
   function back() { setErrors({}); setStep((s) => Math.max(0, s - 1)); }
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    // Step 1 + 2 are optional, only contact details are required.
     const contactSchema = z.object({
       name: z.string().trim().min(2, "Name is required").max(120),
       company: z.string().trim().min(2, "Company name is required").max(160),
@@ -60,8 +59,26 @@ export function AuditForm() {
       setErrors(fe);
       return;
     }
-    setDone(true);
-    toast.success("Audit request received", { description: "We'll reply within one business day." });
+
+    try {
+      const res = await fetch("/api/audit-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) {
+        toast.error("Couldn't send your request", {
+          description: json.error ?? "Please try again or email enquiry@afritechsystemsltd.com directly.",
+        });
+        return;
+      }
+      setDone(true);
+      toast.success("Audit request sent", { description: "Our team will reply within one business day." });
+    } catch (err) {
+      console.error(err);
+      toast.error("Network error", { description: "Please try again in a moment." });
+    }
   }
 
   if (done) {

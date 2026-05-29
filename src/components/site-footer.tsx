@@ -12,7 +12,7 @@ export function SiteFooter() {
           {/* Brand */}
           <div className="md:col-span-4">
             <Link to="/" aria-label={SITE.name} className="inline-flex">
-              <Logo className="h-12 w-auto sm:h-14" />
+              <Logo className="h-16 w-auto sm:h-20" />
             </Link>
             <p className="mt-3 max-w-sm text-sm text-muted-foreground">
               {SITE.tagline}. We build custom systems that replace spreadsheets and manual work.
