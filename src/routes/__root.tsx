@@ -131,6 +131,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <SiteFooter />
+        <ScrollProgress />
         <AiChatWidget />
       </div>
     </QueryClientProvider>
