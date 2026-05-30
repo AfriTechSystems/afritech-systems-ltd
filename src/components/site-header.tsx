@@ -5,17 +5,20 @@ import logoLight from "@/assets/afritech-logo-full.png";
 import logoDark from "@/assets/afritech-logo-dark.png";
 import { NAV_GROUPS, SIMPLE_NAV, SITE } from "@/lib/site";
 import { ThemeToggle } from "./theme-toggle";
+import { BookCallButton } from "./book-call-button";
 
 function Logo({ className = "" }: { className?: string }) {
   return (
     <>
+      {/* In light mode the header background is dark, so show the white/dark logo */}
       <img
-        src={logoLight}
+        src={logoDark}
         alt={`${SITE.name} logo`}
         className={`block dark:hidden object-contain ${className}`}
       />
+      {/* In dark mode the header background is light, so show the colored logo */}
       <img
-        src={logoDark}
+        src={logoLight}
         alt={`${SITE.name} logo`}
         className={`hidden dark:block object-contain ${className}`}
       />
@@ -30,13 +33,13 @@ export function SiteHeader() {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
 
   return (
-    <div className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
+    <div className="sticky top-0 z-50 px-2 pt-2 sm:px-4 sm:pt-4">
       <header
-        className="relative mx-auto max-w-7xl rounded-2xl border border-border bg-background/95 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.25)] backdrop-blur-xl"
+        className="relative mx-auto max-w-7xl rounded-2xl border border-white/10 bg-[#0F1B2D]/95 text-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.55)] backdrop-blur-xl dark:border-border dark:bg-background/95 dark:text-foreground"
       >
-        <div className="flex h-20 items-center justify-between gap-4 px-4 sm:h-24 sm:px-6">
+        <div className="flex h-24 items-center justify-between gap-3 px-3 sm:h-28 sm:px-6">
           <Link to="/" className="flex shrink-0 items-center" aria-label={SITE.name}>
-            <Logo className="h-14 w-auto sm:h-16 md:h-20" />
+            <Logo className="h-20 w-auto sm:h-24 md:h-28" />
           </Link>
 
           {/* Desktop nav */}
@@ -44,8 +47,8 @@ export function SiteHeader() {
             <Link
               to="/"
               activeOptions={{ exact: true }}
-              activeProps={{ className: "text-brand bg-accent/60" }}
-              className="rounded-md px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-accent hover:text-brand"
+              activeProps={{ className: "text-brand-glow bg-white/10 dark:bg-accent/60" }}
+              className="rounded-md px-3 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white dark:text-foreground dark:hover:bg-accent dark:hover:text-brand"
             >
               Home
             </Link>
@@ -58,7 +61,7 @@ export function SiteHeader() {
               >
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-accent hover:text-brand"
+                  className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white dark:text-foreground dark:hover:bg-accent dark:hover:text-brand"
                 >
                   {group.label}
                   <ChevronDown className="h-3.5 w-3.5 opacity-70" />
@@ -90,21 +93,25 @@ export function SiteHeader() {
                 )}
               </div>
             ))}
+            <Link
+              to="/articles"
+              activeProps={{ className: "text-brand-glow bg-white/10 dark:bg-accent/60" }}
+              className="rounded-md px-3 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white dark:text-foreground dark:hover:bg-accent dark:hover:text-brand"
+            >
+              Articles
+            </Link>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <ThemeToggle />
-            <Link
-              to="/contact"
-              className="hidden rounded-full bg-brand px-4 py-2 text-sm font-semibold text-brand-foreground shadow-glow transition-transform hover:scale-[1.03] sm:inline-flex"
-            >
-              Get a free audit
-            </Link>
+            <div className="hidden sm:block">
+              <BookCallButton label="Book a call" size="sm" />
+            </div>
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-label="Toggle menu"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border text-foreground lg:hidden"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white lg:hidden dark:border-border dark:text-foreground"
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -114,7 +121,7 @@ export function SiteHeader() {
         {/* Mobile drawer */}
         {open && (
           <nav
-            className="border-t border-border lg:hidden animate-in slide-in-from-top-2 duration-200"
+            className="border-t border-white/10 lg:hidden animate-in slide-in-from-top-2 duration-200 dark:border-border"
             aria-label="Mobile"
           >
             <div className="flex flex-col px-3 py-3">
@@ -124,48 +131,23 @@ export function SiteHeader() {
                   to={item.to}
                   onClick={() => setOpen(false)}
                   activeOptions={{ exact: item.to === "/" }}
-                  activeProps={{ className: "text-brand bg-accent" }}
-                  className="rounded-lg px-4 py-3 text-base font-semibold text-foreground hover:bg-accent"
+                  activeProps={{ className: "text-brand-glow bg-white/10 dark:bg-accent" }}
+                  className="rounded-lg px-4 py-3 text-base font-semibold text-white/90 hover:bg-white/10 dark:text-foreground dark:hover:bg-accent"
                 >
                   {item.label}
                 </Link>
               ))}
-              <div className="mt-3 grid gap-2 border-t border-border pt-3">
-                {NAV_GROUPS.map((g) => (
-                  <details key={g.label} className="group rounded-lg border border-border bg-card/60 px-3">
-                    <summary className="flex cursor-pointer items-center justify-between py-2.5 text-sm font-semibold text-foreground">
-                      {g.label}
-                      <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
-                    </summary>
-                    <div className="pb-3 pt-1">
-                      {g.items.map((it) => {
-                        const Icon = it.icon;
-                        return (
-                          <Link
-                            key={it.label}
-                            to={it.to}
-                            onClick={() => setOpen(false)}
-                            className="flex items-start gap-3 rounded-md px-2 py-2 text-sm text-foreground hover:bg-accent"
-                          >
-                            <Icon className="mt-0.5 h-4 w-4 text-brand" />
-                            <span>
-                              <span className="block font-medium">{it.label}</span>
-                              <span className="block text-xs text-muted-foreground">{it.desc}</span>
-                            </span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </details>
-                ))}
-              </div>
               <Link
-                to="/contact"
+                to="/articles"
                 onClick={() => setOpen(false)}
-                className="mt-4 inline-flex items-center justify-center rounded-full bg-brand px-5 py-3 text-sm font-semibold text-brand-foreground shadow-glow"
+                activeProps={{ className: "text-brand-glow bg-white/10 dark:bg-accent" }}
+                className="rounded-lg px-4 py-3 text-base font-semibold text-white/90 hover:bg-white/10 dark:text-foreground dark:hover:bg-accent"
               >
-                Get a free audit
+                Articles
               </Link>
+              <div className="mt-3 px-2">
+                <BookCallButton label="Book a discovery call" size="md" className="w-full" />
+              </div>
             </div>
           </nav>
         )}
