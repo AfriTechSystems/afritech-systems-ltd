@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const BASE_URL = "https://afritechsystemsltd.com";
+const BASE_URL = "https://afritechsystemsltd.lovable.app";
 
 interface SitemapEntry {
   path: string;
-  changefreq?: "weekly" | "monthly";
+  lastmod?: string;
+  changefreq?: "weekly" | "monthly" | "daily";
   priority?: string;
 }
 
@@ -20,12 +22,34 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/integrations", changefreq: "monthly", priority: "0.8" },
           { path: "/about", changefreq: "monthly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.8" },
+          { path: "/articles", changefreq: "weekly", priority: "0.8" },
         ];
+
+        try {
+          const { data } = await supabaseAdmin
+            .from("articles")
+            .select("slug, updated_at")
+            .eq("published", true)
+            .order("published_at", { ascending: false });
+          if (data) {
+            for (const a of data) {
+              entries.push({
+                path: `/articles/${a.slug}`,
+                lastmod: a.updated_at ? new Date(a.updated_at).toISOString() : undefined,
+                changefreq: "monthly",
+                priority: "0.7",
+              });
+            }
+          }
+        } catch (e) {
+          console.error("sitemap articles fetch failed", e);
+        }
 
         const urls = entries.map((e) =>
           [
             `  <url>`,
             `    <loc>${BASE_URL}${e.path}</loc>`,
+            e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             `  </url>`,
@@ -40,7 +64,7 @@ export const Route = createFileRoute("/sitemap.xml")({
         ].join("\n");
 
         return new Response(xml, {
-          headers: { "Content-Type": "application/xml", "Cache-Control": "public, max-age=3600" },
+          headers: { "Content-Type": "application/xml", "Cache-Control": "public, max-age=600" },
         });
       },
     },
