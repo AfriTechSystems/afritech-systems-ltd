@@ -3,6 +3,8 @@ import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { PageHero } from "@/components/page-hero";
 import { AuditForm } from "@/components/home/audit-form";
 import { SocialLinks } from "@/components/social-links";
+import { CalendlyInline } from "@/components/calendly-inline";
+import { BookCallButton } from "@/components/book-call-button";
 import { Toaster } from "@/components/ui/sonner";
 import { SITE } from "@/lib/site";
 
@@ -13,9 +15,9 @@ export const Route = createFileRoute("/contact")({
       { name: "description", content: "Talk to AfriTech Systems about ERP, school management or industrial automation. Email enquiry@afritechsystemsltd.com or call +260 969 071 139." },
       { property: "og:title", content: "Contact AfriTech Systems" },
       { property: "og:description", content: "Book a free systems audit with AfriTech Systems Limited." },
-      { property: "og:url", content: "/contact" },
+      { property: "og:url", content: "https://afritechsystemsltd.lovable.app/contact" },
     ],
-    links: [{ rel: "canonical", href: "/contact" }],
+    links: [{ rel: "canonical", href: "https://afritechsystemsltd.lovable.app/contact" }],
     scripts: [{
       type: "application/ld+json",
       children: JSON.stringify({
@@ -45,12 +47,13 @@ function Contact() {
       <PageHero
         eyebrow="Contact"
         title="Let's talk."
-        description="Tell us what's slowing your business down. We'll reply within one business day with a clear next step."
+        description="Tell us what's slowing your business down. Book a free 30-minute discovery call or send us a message — we reply within one business day."
       />
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-5 lg:gap-8 lg:px-8">
-        {/* Info column */}
+
+      {/* Booking + contact details */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:grid lg:grid-cols-5 lg:gap-8 lg:px-8 lg:py-12">
         <aside className="lg:col-span-2">
-          <div className="rounded-2xl border border-border bg-card/60 p-6 sm:p-7">
+          <div className="rounded-2xl border border-border bg-card/60 p-5 sm:p-7">
             <h2 className="font-display text-2xl font-bold">Visit or reach us</h2>
             <ul className="mt-6 space-y-5 text-sm">
               <li className="flex items-start gap-3">
@@ -68,7 +71,7 @@ function Contact() {
                 </span>
                 <div>
                   <p className="text-xs uppercase tracking-wider text-muted-foreground">Email</p>
-                  <a href={`mailto:${SITE.email}`} className="mt-1 block font-semibold hover:text-brand">{SITE.email}</a>
+                  <a href={`mailto:${SITE.email}`} className="mt-1 block font-semibold hover:text-brand break-all">{SITE.email}</a>
                 </div>
               </li>
               <li className="flex items-start gap-3">
@@ -84,19 +87,12 @@ function Contact() {
               </li>
             </ul>
 
-            <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-              <a
-                href="#audit"
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-brand-foreground shadow-glow"
-              >
-                Book a free audit
+            <div className="mt-6 flex flex-col gap-2">
+              <BookCallButton label="Book a free discovery call" size="md" className="w-full" />
+              <a href="#audit" className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-semibold hover:border-brand hover:text-brand">
+                Send a written brief
               </a>
-              <a
-                href={waLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold hover:border-brand hover:text-brand"
-              >
+              <a href={waLink} target="_blank" rel="noopener noreferrer" className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-semibold hover:border-brand hover:text-brand">
                 <MessageCircle className="h-4 w-4" /> WhatsApp us
               </a>
             </div>
@@ -108,17 +104,29 @@ function Contact() {
           </div>
         </aside>
 
-        {/* Map */}
-        <div className="overflow-hidden rounded-2xl border border-border bg-card/60 lg:col-span-3">
+        {/* Calendly inline */}
+        <div className="mt-6 lg:col-span-3 lg:mt-0">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="font-display text-2xl font-bold">Pick a time</h2>
+            <span className="text-xs text-muted-foreground">30 min · Free</span>
+          </div>
+          <CalendlyInline />
+        </div>
+      </section>
+
+      {/* Map */}
+      <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card/60">
           <iframe
             title="AfriTech Systems office location"
             src="https://www.google.com/maps?q=Ibex+Hill,+Lusaka,+Zambia&output=embed"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            className="h-72 w-full sm:h-96 lg:h-full lg:min-h-[480px]"
+            className="h-72 w-full sm:h-96"
           />
         </div>
       </section>
+
       <AuditForm />
       <Toaster />
     </>

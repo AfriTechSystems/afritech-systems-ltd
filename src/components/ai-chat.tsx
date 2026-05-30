@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -10,14 +12,14 @@ import alfredBot from "@/assets/alfred-bot.png";
 const chatTransport = new DefaultChatTransport({ api: "/api/chat" });
 
 const STARTER_QUESTIONS = [
-  "What services does AfriTech Systems offer?",
+  "What services do you offer?",
   "How much does a custom ERP cost?",
-  "Can you automate my business operations?",
+  "Can you automate my operations?",
 ];
 
 const FOLLOWUP_CHIPS = [
-  "Book a free audit",
-  "Tell me about pricing",
+  "Book a free call",
+  "Pricing details",
   "Show case studies",
   "Talk to a human",
 ];
@@ -56,40 +58,33 @@ export function AiChatWidget() {
 
   return (
     <>
-      {/* Floating launcher — transparent bot, no background */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 group"
+          className="fixed bottom-4 right-4 z-50 group sm:bottom-6 sm:right-6"
           aria-label="Chat with Alfred"
         >
-          <span className="absolute -top-2 right-0 hidden rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold text-brand-foreground shadow-md sm:block">
+          <span className="absolute -top-1 right-0 hidden rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold text-brand-foreground shadow-md sm:block">
             Ask Alfred
           </span>
           <img
             src={alfredBot}
             alt="Alfred AI Assistant"
-            className="h-20 w-20 object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.35)] transition-transform group-hover:scale-110 animate-float"
+            className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.35)] transition-transform group-hover:scale-110 animate-float"
           />
           <span className="absolute bottom-1 right-1 h-3 w-3 rounded-full bg-success ring-2 ring-background" />
         </button>
       )}
 
-      {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex w-[94vw] max-w-[400px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl sm:w-[400px]">
-          {/* Header */}
-          <div className="flex items-center justify-between gap-3 border-b border-border bg-gradient-to-r from-brand to-brand-glow px-4 py-3">
-            <div className="flex items-center gap-3">
-              <img
-                src={alfredBot}
-                alt="Alfred"
-                className="h-12 w-12 shrink-0 object-contain drop-shadow-md"
-              />
+        <div className="fixed bottom-3 right-3 z-50 flex w-[88vw] max-w-[360px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl sm:bottom-6 sm:right-6 sm:w-[380px] sm:max-w-[380px]">
+          <div className="flex items-center justify-between gap-2 border-b border-border bg-gradient-to-r from-brand to-brand-glow px-3 py-2.5 sm:px-4 sm:py-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <img src={alfredBot} alt="Alfred" className="h-9 w-9 sm:h-11 sm:w-11 shrink-0 object-contain drop-shadow-md" />
               <div>
                 <p className="text-sm font-bold text-brand-foreground">Alfred</p>
-                <p className="text-[11px] text-brand-foreground/85">
-                  {isLoading ? "Typing…" : "AfriTech Sales Assistant • Online"}
+                <p className="text-[10px] sm:text-[11px] text-brand-foreground/85">
+                  {isLoading ? "Typing…" : "AfriTech Sales · Online"}
                 </p>
               </div>
             </div>
@@ -102,24 +97,22 @@ export function AiChatWidget() {
             </button>
           </div>
 
-          {/* Messages */}
-          <ScrollArea className="h-[380px] sm:h-[440px]" ref={scrollRef}>
-            <div className="flex flex-col gap-3 p-4">
+          <ScrollArea className="h-[62vh] max-h-[440px] sm:h-[420px]" ref={scrollRef}>
+            <div className="flex flex-col gap-3 p-3 sm:p-4">
               {messages.length === 0 && (
-                <div className="space-y-4">
-                  <div className="rounded-2xl rounded-bl-md bg-muted px-3.5 py-3 text-sm leading-relaxed text-foreground">
-                    <p className="font-semibold">👋 Hi, I'm Alfred from AfriTech Systems.</p>
+                <div className="space-y-3">
+                  <div className="rounded-2xl rounded-bl-md bg-muted px-3 py-2.5 text-[13px] leading-relaxed text-foreground">
+                    <p className="font-semibold">👋 Hi, I'm Alfred.</p>
                     <p className="mt-1 text-muted-foreground">
-                      I help businesses replace expensive SaaS with custom-built
-                      systems they fully own. Ask me anything, or pick a question below:
+                      I help businesses replace expensive SaaS with custom systems they own. Pick a question or ask anything:
                     </p>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-1.5">
                     {STARTER_QUESTIONS.map((q) => (
                       <button
                         key={q}
                         onClick={() => send(q)}
-                        className="rounded-xl border border-border bg-background px-3 py-2.5 text-left text-xs font-medium text-foreground transition-all hover:border-brand hover:bg-brand/5 hover:text-brand"
+                        className="rounded-xl border border-border bg-background px-3 py-2 text-left text-[12px] font-medium text-foreground transition-all hover:border-brand hover:bg-brand/5 hover:text-brand"
                       >
                         {q}
                       </button>
@@ -130,34 +123,28 @@ export function AiChatWidget() {
 
               {messages.map((message) => {
                 const isUser = message.role === "user";
-                const text = message.parts
-                  ?.map((part) => (part.type === "text" ? part.text : ""))
-                  .join("");
+                const text = message.parts?.map((part) => (part.type === "text" ? part.text : "")).join("");
 
                 return (
-                  <div
-                    key={message.id}
-                    className={cn(
-                      "flex gap-2",
-                      isUser ? "flex-row-reverse" : "flex-row"
-                    )}
-                  >
-                    {!isUser && (
-                      <img
-                        src={alfredBot}
-                        alt=""
-                        className="h-8 w-8 shrink-0 object-contain"
-                      />
-                    )}
+                  <div key={message.id} className={cn("flex gap-2", isUser ? "flex-row-reverse" : "flex-row")}>
+                    {!isUser && <img src={alfredBot} alt="" className="h-7 w-7 shrink-0 object-contain" />}
                     <div
                       className={cn(
-                        "max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap",
+                        "max-w-[82%] rounded-2xl px-3 py-2 text-[13px] leading-relaxed",
                         isUser
                           ? "rounded-br-md bg-primary text-primary-foreground"
-                          : "rounded-bl-md bg-muted text-foreground"
+                          : "rounded-bl-md bg-muted text-foreground",
                       )}
                     >
-                      {text || (
+                      {text ? (
+                        isUser ? (
+                          <span className="whitespace-pre-wrap">{text}</span>
+                        ) : (
+                          <div className="prose prose-sm max-w-none [&_p]:my-1.5 [&_ul]:my-1.5 [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:my-1.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_li]:my-0.5 [&_h1]:text-sm [&_h2]:text-sm [&_h3]:text-sm [&_h1]:font-bold [&_h2]:font-bold [&_h3]:font-semibold [&_strong]:font-semibold [&_a]:text-brand [&_a]:underline">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+                          </div>
+                        )
+                      ) : (
                         <span className="italic opacity-60">Thinking…</span>
                       )}
                     </div>
@@ -165,26 +152,23 @@ export function AiChatWidget() {
                 );
               })}
 
-              {isLoading &&
-                messages.length > 0 &&
-                messages[messages.length - 1]?.role === "user" && (
-                  <div className="flex gap-2">
-                    <img src={alfredBot} alt="" className="h-8 w-8 shrink-0 object-contain" />
-                    <div className="flex items-center gap-1 rounded-2xl rounded-bl-md bg-muted px-3.5 py-2.5">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Alfred is typing…</span>
-                    </div>
+              {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === "user" && (
+                <div className="flex gap-2">
+                  <img src={alfredBot} alt="" className="h-7 w-7 shrink-0 object-contain" />
+                  <div className="flex items-center gap-1 rounded-2xl rounded-bl-md bg-muted px-3 py-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Alfred is typing…</span>
                   </div>
-                )}
+                </div>
+              )}
 
-              {/* Follow-up quick reply chips */}
               {showFollowups && (
-                <div className="mt-1 flex flex-wrap gap-1.5 pl-10">
+                <div className="mt-1 flex flex-wrap gap-1.5 pl-9">
                   {FOLLOWUP_CHIPS.map((chip) => (
                     <button
                       key={chip}
                       onClick={() => send(chip)}
-                      className="rounded-full border border-brand/40 bg-brand/5 px-3 py-1 text-[11px] font-medium text-brand transition-colors hover:bg-brand hover:text-brand-foreground"
+                      className="rounded-full border border-brand/40 bg-brand/5 px-2.5 py-1 text-[10px] font-medium text-brand transition-colors hover:bg-brand hover:text-brand-foreground"
                     >
                       {chip}
                     </button>
@@ -194,28 +178,20 @@ export function AiChatWidget() {
             </div>
           </ScrollArea>
 
-          {/* Input */}
-          <form
-            onSubmit={handleSubmit}
-            className="flex items-center gap-2 border-t border-border bg-card p-3"
-          >
+          <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-border bg-card p-2 sm:p-3">
             <Input
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Ask Alfred anything…"
-              className="h-10 flex-1 bg-background text-sm"
+              className="h-9 flex-1 bg-background text-sm"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={isLoading || !inputValue.trim()}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-brand text-brand-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-brand text-brand-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
             >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </button>
           </form>
         </div>

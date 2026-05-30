@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 
@@ -15,11 +16,7 @@ const LeadSchema = z.object({
 });
 
 function escape(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function buildHtml(d: z.infer<typeof LeadSchema>) {
@@ -68,43 +65,56 @@ export const Route = createFileRoute("/api/audit-lead")({
         if (!parsed.success) {
           return Response.json(
             { ok: false, error: "Validation failed", details: parsed.error.issues },
-            { status: 400 }
+            { status: 400 },
           );
         }
         const data = parsed.data;
 
-        const lovableKey = process.env.LOVABLE_API_KEY;
-        const resendKey = process.env.RESEND_API_KEY;
-        if (!lovableKey || !resendKey) {
-          return Response.json(
-            { ok: false, error: "Email service is not configured" },
-            { status: 500 }
-          );
+        // 1) Persist lead in the database (admin client bypasses RLS but the table itself accepts public inserts)
+        try {
+          const { error: insErr } = await supabaseAdmin.from("leads").insert({
+            name: data.name,
+            company: data.company,
+            email: data.email,
+            bottleneck: data.bottleneck,
+            help: data.help,
+            engine: data.engine,
+            metric: data.metric,
+            message: data.message,
+            source: "audit_form",
+          });
+          if (insErr) console.error("lead insert failed", insErr);
+        } catch (e) {
+          console.error("lead insert exception", e);
         }
 
-        const res = await fetch(`${GATEWAY_URL}/emails`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${lovableKey}`,
-            "X-Connection-Api-Key": resendKey,
-          },
-          body: JSON.stringify({
-            from: "AfriTech Website <onboarding@resend.dev>",
-            to: ["enquiry@afritechsystemsltd.com"],
-            reply_to: data.email,
-            subject: `New Audit Request — ${data.company} (${data.name})`,
-            html: buildHtml(data),
-          }),
-        });
-
-        if (!res.ok) {
-          const errText = await res.text().catch(() => "");
-          console.error("Resend send failed", res.status, errText);
-          return Response.json(
-            { ok: false, error: "Could not send email. Please try again." },
-            { status: 502 }
-          );
+        // 2) Send email (best-effort)
+        const lovableKey = process.env.LOVABLE_API_KEY;
+        const resendKey = process.env.RESEND_API_KEY;
+        if (lovableKey && resendKey) {
+          try {
+            const res = await fetch(`${GATEWAY_URL}/emails`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${lovableKey}`,
+                "X-Connection-Api-Key": resendKey,
+              },
+              body: JSON.stringify({
+                from: "AfriTech Website <onboarding@resend.dev>",
+                to: ["enquiry@afritechsystemsltd.com"],
+                reply_to: data.email,
+                subject: `New Audit Request — ${data.company} (${data.name})`,
+                html: buildHtml(data),
+              }),
+            });
+            if (!res.ok) {
+              const t = await res.text().catch(() => "");
+              console.error("Resend send failed", res.status, t);
+            }
+          } catch (e) {
+            console.error("Resend exception", e);
+          }
         }
 
         return Response.json({ ok: true });
