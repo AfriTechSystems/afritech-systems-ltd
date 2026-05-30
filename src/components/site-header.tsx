@@ -10,15 +10,15 @@ import { BookCallButton } from "./book-call-button";
 function Logo({ className = "" }: { className?: string }) {
   return (
     <>
-      {/* In light mode the header background is dark, so show the white/dark logo */}
+      {/* Light mode header has light bg, so show the full-color logo */}
       <img
-        src={logoDark}
+        src={logoLight}
         alt={`${SITE.name} logo`}
         className={`block dark:hidden object-contain ${className}`}
       />
-      {/* In dark mode the header background is light, so show the colored logo */}
+      {/* Dark mode header has dark bg, so show the white/inverted logo */}
       <img
-        src={logoLight}
+        src={logoDark}
         alt={`${SITE.name} logo`}
         className={`hidden dark:block object-contain ${className}`}
       />
@@ -35,7 +35,7 @@ export function SiteHeader() {
   return (
     <div className="sticky top-0 z-50 px-2 pt-2 sm:px-4 sm:pt-4">
       <header
-        className="relative mx-auto max-w-7xl rounded-2xl border border-white/10 bg-[#0F1B2D]/95 text-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.55)] backdrop-blur-xl dark:border-border dark:bg-background/95 dark:text-foreground"
+        className="relative mx-auto max-w-7xl rounded-2xl border border-border bg-background/95 text-foreground shadow-[0_10px_40px_-15px_rgba(0,0,0,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-[#0F1B2D]/95 dark:text-white dark:shadow-[0_10px_40px_-15px_rgba(0,0,0,0.55)]"
       >
         <div className="flex h-24 items-center justify-between gap-3 px-3 sm:h-28 sm:px-6">
           <Link to="/" className="flex shrink-0 items-center" aria-label={SITE.name}>
@@ -47,8 +47,8 @@ export function SiteHeader() {
             <Link
               to="/"
               activeOptions={{ exact: true }}
-              activeProps={{ className: "text-brand-glow bg-white/10 dark:bg-accent/60" }}
-              className="rounded-md px-3 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white dark:text-foreground dark:hover:bg-accent dark:hover:text-brand"
+              activeProps={{ className: "text-brand bg-accent dark:bg-white/10 dark:text-brand-glow" }}
+              className="rounded-md px-3 py-2 text-sm font-semibold text-foreground/90 transition-colors hover:bg-accent hover:text-brand dark:text-white/90 dark:hover:bg-white/10 dark:hover:text-white"
             >
               Home
             </Link>
@@ -61,7 +61,7 @@ export function SiteHeader() {
               >
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white dark:text-foreground dark:hover:bg-accent dark:hover:text-brand"
+                  className="inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-semibold text-foreground/90 transition-colors hover:bg-accent hover:text-brand dark:text-white/90 dark:hover:bg-white/10 dark:hover:text-white"
                 >
                   {group.label}
                   <ChevronDown className="h-3.5 w-3.5 opacity-70" />
@@ -95,8 +95,8 @@ export function SiteHeader() {
             ))}
             <Link
               to="/articles"
-              activeProps={{ className: "text-brand-glow bg-white/10 dark:bg-accent/60" }}
-              className="rounded-md px-3 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/10 hover:text-white dark:text-foreground dark:hover:bg-accent dark:hover:text-brand"
+              activeProps={{ className: "text-brand bg-accent dark:bg-white/10 dark:text-brand-glow" }}
+              className="rounded-md px-3 py-2 text-sm font-semibold text-foreground/90 transition-colors hover:bg-accent hover:text-brand dark:text-white/90 dark:hover:bg-white/10 dark:hover:text-white"
             >
               Articles
             </Link>
@@ -111,7 +111,7 @@ export function SiteHeader() {
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-label="Toggle menu"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 text-white lg:hidden dark:border-border dark:text-foreground"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border text-foreground lg:hidden dark:border-white/20 dark:text-white"
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -121,7 +121,7 @@ export function SiteHeader() {
         {/* Mobile drawer */}
         {open && (
           <nav
-            className="border-t border-white/10 lg:hidden animate-in slide-in-from-top-2 duration-200 dark:border-border"
+            className="border-t border-border lg:hidden animate-in slide-in-from-top-2 duration-200 dark:border-white/10"
             aria-label="Mobile"
           >
             <div className="flex flex-col px-3 py-3">
@@ -131,8 +131,8 @@ export function SiteHeader() {
                   to={item.to}
                   onClick={() => setOpen(false)}
                   activeOptions={{ exact: item.to === "/" }}
-                  activeProps={{ className: "text-brand-glow bg-white/10 dark:bg-accent" }}
-                  className="rounded-lg px-4 py-3 text-base font-semibold text-white/90 hover:bg-white/10 dark:text-foreground dark:hover:bg-accent"
+                  activeProps={{ className: "text-brand bg-accent dark:bg-white/10 dark:text-brand-glow" }}
+                  className="rounded-lg px-4 py-3 text-base font-semibold text-foreground/90 hover:bg-accent dark:text-white/90 dark:hover:bg-white/10"
                 >
                   {item.label}
                 </Link>
@@ -140,8 +140,8 @@ export function SiteHeader() {
               <Link
                 to="/articles"
                 onClick={() => setOpen(false)}
-                activeProps={{ className: "text-brand-glow bg-white/10 dark:bg-accent" }}
-                className="rounded-lg px-4 py-3 text-base font-semibold text-white/90 hover:bg-white/10 dark:text-foreground dark:hover:bg-accent"
+                activeProps={{ className: "text-brand bg-accent dark:bg-white/10 dark:text-brand-glow" }}
+                className="rounded-lg px-4 py-3 text-base font-semibold text-foreground/90 hover:bg-accent dark:text-white/90 dark:hover:bg-white/10"
               >
                 Articles
               </Link>
