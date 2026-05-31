@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Article images are publicly readable" ON storage.objects;
