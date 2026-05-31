@@ -15,9 +15,9 @@ export const Route = createFileRoute("/contact")({
       { name: "description", content: "Talk to AfriTech Systems about ERP, school management or industrial automation. Email enquiry@afritechsystemsltd.com or call +260 969 071 139." },
       { property: "og:title", content: "Contact AfriTech Systems" },
       { property: "og:description", content: "Book a free systems audit with AfriTech Systems Limited." },
-      { property: "og:url", content: "https://afritechsystemsltd.lovable.app/contact" },
+      { property: "og:url", content: "https://afritechsystemsltd.com/contact" },
     ],
-    links: [{ rel: "canonical", href: "https://afritechsystemsltd.lovable.app/contact" }],
+    links: [{ rel: "canonical", href: "https://afritechsystemsltd.com/contact" }],
     scripts: [{
       type: "application/ld+json",
       children: JSON.stringify({

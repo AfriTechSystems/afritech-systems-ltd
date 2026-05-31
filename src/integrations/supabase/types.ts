@@ -18,12 +18,16 @@ export type Database = {
         Row: {
           author_id: string | null
           body_md: string
+          cover_alt: string | null
           cover_url: string | null
           created_at: string
           excerpt: string
           id: string
+          og_image: string | null
           published: boolean
           published_at: string | null
+          seo_description: string | null
+          seo_title: string | null
           slug: string
           tags: string[]
           title: string
@@ -32,12 +36,16 @@ export type Database = {
         Insert: {
           author_id?: string | null
           body_md?: string
+          cover_alt?: string | null
           cover_url?: string | null
           created_at?: string
           excerpt?: string
           id?: string
+          og_image?: string | null
           published?: boolean
           published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug: string
           tags?: string[]
           title: string
@@ -46,12 +54,16 @@ export type Database = {
         Update: {
           author_id?: string | null
           body_md?: string
+          cover_alt?: string | null
           cover_url?: string | null
           created_at?: string
           excerpt?: string
           id?: string
+          og_image?: string | null
           published?: boolean
           published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug?: string
           tags?: string[]
           title?: string

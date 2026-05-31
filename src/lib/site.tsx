@@ -18,16 +18,20 @@ export const SOCIALS = [
   { name: "X", href: "#", live: false, icon: "x" },
 ] as const;
 
+// Canonical site URL — used for canonical tags, og:url, sitemap, JSON-LD.
+export const SITE_URL = "https://afritechsystemsltd.com";
+
 export const NAV = [
   { to: "/", label: "Home" },
   { to: "/solutions", label: "Solutions" },
   { to: "/industries", label: "Industries" },
   { to: "/integrations", label: "Integrations" },
+  { to: "/articles", label: "Articles" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
-import { Boxes, GraduationCap, Factory, Truck, BarChart3, Plug, Building2, Mail, Briefcase } from "lucide-react";
+import { Boxes, GraduationCap, Factory, Truck, BarChart3, Plug, Building2, Mail } from "lucide-react";
 
 export const NAV_GROUPS = [
   {
@@ -60,11 +64,13 @@ export const NAV_GROUPS = [
   },
 ] as const;
 
+// Ordered: Home · Solutions · Industries · Integrations · Articles · About · Contact
 export const SIMPLE_NAV = [
   { to: "/", label: "Home" },
   { to: "/solutions", label: "Solutions" },
   { to: "/industries", label: "Industries" },
   { to: "/integrations", label: "Integrations" },
+  { to: "/articles", label: "Articles" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ] as const;

@@ -13,8 +13,7 @@ import appCss from "../styles.css?url";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AiChatWidget } from "@/components/ai-chat";
-import { ScrollProgress } from "@/components/scroll-progress";
-import { SITE } from "@/lib/site";
+import { SITE, SITE_URL } from "@/lib/site";
 
 const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`;
 
@@ -60,21 +59,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#0F1B2D" },
-      { title: `${SITE.name} — ${SITE.tagline}` },
-      { name: "description", content: "Stop wrestling with chaotic Excel sheets. We design custom software ecosystems, automated workflows, and enterprise ERP solutions built for business growth" },
       { name: "author", content: SITE.name },
       { property: "og:site_name", content: SITE.name },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: `${SITE.name} — ${SITE.tagline}` },
-      { property: "og:description", content: "Stop wrestling with chaotic Excel sheets. We design custom software ecosystems, automated workflows, and enterprise ERP solutions built for business growth" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: `${SITE.name} — ${SITE.tagline}` },
-      { name: "twitter:description", content: "Stop wrestling with chaotic Excel sheets. We design custom software ecosystems, automated workflows, and enterprise ERP solutions built for business growth" },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2e485fea-58fc-4b4f-8006-08e16aab7dd8/id-preview-eb9fa8de--466ac3f1-4c54-41f1-b221-db2be7166b47.lovable.app-1779979497286.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2e485fea-58fc-4b4f-8006-08e16aab7dd8/id-preview-eb9fa8de--466ac3f1-4c54-41f1-b221-db2be7166b47.lovable.app-1779979497286.png" },
-      { title: "Afritech Systems Limited - Software Tech Company" },
-      { property: "og:title", content: "Afritech Systems Limited - Software Tech Company" },
-      { name: "twitter:title", content: "Afritech Systems Limited - Software Tech Company" },
+      { property: "og:image", content: `${SITE_URL}/favicon.png` },
+      { name: "twitter:image", content: `${SITE_URL}/favicon.png` },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -90,10 +80,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "Organization",
           name: SITE.name,
-          url: `https://${SITE.domain}`,
+          url: SITE_URL,
           email: SITE.email,
           telephone: SITE.phones[0],
-          address: { "@type": "PostalAddress", addressLocality: "Lusaka", addressCountry: "ZM" },
+          address: { "@type": "PostalAddress", streetAddress: "Plot No. 1907, MJ Zulu Street, Ibex Hill", addressLocality: "Lusaka", addressRegion: "Lusaka Province", addressCountry: "ZM" },
           areaServed: "Africa",
           description: "Enterprise automation, custom ERP, school management and industrial digitization across Pan-Africa.",
         }),
@@ -131,7 +121,6 @@ function RootComponent() {
           <Outlet />
         </main>
         <SiteFooter />
-        <ScrollProgress />
         <AiChatWidget />
       </div>
     </QueryClientProvider>
