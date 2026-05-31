@@ -37,9 +37,9 @@ export function SiteHeader() {
       <header
         className="relative mx-auto max-w-7xl rounded-2xl border border-border bg-background/95 text-foreground shadow-[0_10px_40px_-15px_rgba(0,0,0,0.18)] backdrop-blur-xl dark:border-white/10 dark:bg-[#0F1B2D]/95 dark:text-white dark:shadow-[0_10px_40px_-15px_rgba(0,0,0,0.55)]"
       >
-        <div className="flex h-24 items-center justify-between gap-3 px-3 sm:h-28 sm:px-6">
+        <div className="flex h-28 items-center justify-between gap-3 px-3 sm:h-32 sm:px-6">
           <Link to="/" className="flex shrink-0 items-center" aria-label={SITE.name}>
-            <Logo className="h-20 w-auto sm:h-24 md:h-28" />
+            <Logo className="h-32 w-auto sm:h-36 md:h-40" />
           </Link>
 
           {/* Desktop nav */}
@@ -137,14 +137,6 @@ export function SiteHeader() {
                   {item.label}
                 </Link>
               ))}
-              <Link
-                to="/articles"
-                onClick={() => setOpen(false)}
-                activeProps={{ className: "text-brand bg-accent dark:bg-white/10 dark:text-brand-glow" }}
-                className="rounded-lg px-4 py-3 text-base font-semibold text-foreground/90 hover:bg-accent dark:text-white/90 dark:hover:bg-white/10"
-              >
-                Articles
-              </Link>
               <div className="mt-3 px-2">
                 <BookCallButton label="Book a discovery call" size="md" className="w-full" />
               </div>
