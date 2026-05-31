@@ -33,10 +33,10 @@ export const Route = createFileRoute("/articles/$slug")({
     meta: [
       { title: `Article — AfriTech Systems` },
       { property: "og:type", content: "article" },
-      { property: "og:url", content: `https://afritechsystemsltd.lovable.app/articles/${params.slug}` },
+      { property: "og:url", content: `https://afritechsystemsltd.com/articles/${params.slug}` },
     ],
     links: [
-      { rel: "canonical", href: `https://afritechsystemsltd.lovable.app/articles/${params.slug}` },
+      { rel: "canonical", href: `https://afritechsystemsltd.com/articles/${params.slug}` },
     ],
   }),
   component: ArticlePage,
@@ -107,7 +107,7 @@ function ArticlePage() {
             datePublished: data.published_at,
             author: { "@type": "Organization", name: "AfriTech Systems Limited" },
             publisher: { "@type": "Organization", name: "AfriTech Systems Limited" },
-            mainEntityOfPage: `https://afritechsystemsltd.lovable.app/articles/${data.slug}`,
+            mainEntityOfPage: `https://afritechsystemsltd.com/articles/${data.slug}`,
           }),
         }}
       />

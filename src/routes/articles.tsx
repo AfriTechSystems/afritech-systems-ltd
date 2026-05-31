@@ -11,9 +11,9 @@ export const Route = createFileRoute("/articles")({
       { name: "description", content: "Insights on enterprise automation, custom ERP, school management and digital transformation for Pan-African businesses." },
       { property: "og:title", content: "Articles — AfriTech Systems" },
       { property: "og:description", content: "Insights and field notes from our engineering and automation teams." },
-      { property: "og:url", content: "https://afritechsystemsltd.lovable.app/articles" },
+      { property: "og:url", content: "https://afritechsystemsltd.com/articles" },
     ],
-    links: [{ rel: "canonical", href: "https://afritechsystemsltd.lovable.app/articles" }],
+    links: [{ rel: "canonical", href: "https://afritechsystemsltd.com/articles" }],
   }),
   component: ArticlesPage,
 });
