@@ -22,8 +22,11 @@ export type Database = {
           created_at: string
           excerpt: string
           id: string
+          og_image: string | null
           published: boolean
           published_at: string | null
+          seo_description: string | null
+          seo_title: string | null
           slug: string
           tags: string[]
           title: string
@@ -36,8 +39,11 @@ export type Database = {
           created_at?: string
           excerpt?: string
           id?: string
+          og_image?: string | null
           published?: boolean
           published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug: string
           tags?: string[]
           title: string
@@ -50,8 +56,11 @@ export type Database = {
           created_at?: string
           excerpt?: string
           id?: string
+          og_image?: string | null
           published?: boolean
           published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug?: string
           tags?: string[]
           title?: string
