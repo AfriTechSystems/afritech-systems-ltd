@@ -56,12 +56,19 @@ function AdminPage() {
         return;
       }
       setAuthed({ userId: data.user.id, email: data.user.email ?? "" });
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.user.id);
-      const adminOrEditor = (roles ?? []).some((r) => r.role === "admin" || r.role === "editor");
-      setIsAdmin(adminOrEditor);
+      // Auto-grant admin to allow-listed emails (ADMIN_EMAILS secret) via server fn.
+      try {
+        const { ensureAdminAccess } = await import("@/lib/admin-access.functions");
+        const res = await ensureAdminAccess();
+        setIsAdmin(!!res.isAdmin);
+      } catch (e) {
+        console.error("ensureAdminAccess failed", e);
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.user.id);
+        setIsAdmin((roles ?? []).some((r) => r.role === "admin" || r.role === "editor"));
+      }
     };
     check();
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => check());
@@ -154,8 +161,9 @@ function AdminPage() {
       <section className="mx-auto max-w-md px-4 py-20 text-center">
         <h1 className="font-display text-2xl font-bold">Access pending</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          You're signed in as <strong>{authed.email}</strong> but don't yet have admin or editor access.
-          Ask an existing admin to grant you a role.
+          You're signed in as <strong>{authed.email}</strong> but this email isn't on the admin allow list.
+          Ask an existing admin to add <code className="rounded bg-muted px-1.5 py-0.5">{authed.email}</code> to the{" "}
+          <code className="rounded bg-muted px-1.5 py-0.5">ADMIN_EMAILS</code> secret in Lovable Cloud, then refresh.
         </p>
         <button onClick={signOut} className="mt-6 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-accent">
           <LogOut className="h-4 w-4" /> Sign out
