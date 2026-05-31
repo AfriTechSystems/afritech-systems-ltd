@@ -12,13 +12,13 @@ export function Hero() {
             <Sparkles className="h-3 w-3 text-brand" />
             Pan-African Enterprise Automation Studio
           </div>
-          <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] text-foreground sm:text-5xl lg:text-7xl drop-shadow-sm">
+          <h1 className="mt-5 font-display text-5xl font-bold leading-[1.05] text-foreground sm:text-6xl lg:text-7xl drop-shadow-sm">
             SYSTEMS <span className="text-gradient-brand">REIMAGINED.</span>
           </h1>
-          <p className="mt-5 max-w-xl text-base font-medium text-foreground sm:text-lg">
+          <p className="mt-5 max-w-xl text-lg font-medium text-foreground sm:text-xl">
             We turn manual, spreadsheet-heavy operations into powerful, automated digital systems.
           </p>
-          <p className="mt-3 max-w-xl text-sm text-muted-foreground sm:text-base leading-relaxed">
+          <p className="mt-3 max-w-xl text-base text-muted-foreground sm:text-lg leading-relaxed">
             Stop wrestling with fragmented workflows and outdated tools. We analyze your unique
             business processes, design custom software solutions and build interactive dashboards
             that run your operations automatically — owned by you, no monthly SaaS fees.
