@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHero } from "@/components/page-hero";
 import { Integrations } from "@/components/home/integrations";
+import { getTool } from "@/lib/integrations";
 
 const CATEGORIES = [
   { name: "Automation & Workflow", tools: ["n8n", "Zapier", "Make", "Workato", "Power Automate"] },
   { name: "Databases & Cloud", tools: ["PostgreSQL", "Supabase", "MongoDB", "Redis", "AWS", "Azure", "Cloudflare"] },
   { name: "Communication", tools: ["Slack", "Microsoft Teams", "WhatsApp Business", "Twilio", "SendGrid", "Mailgun"] },
-  { name: "Productivity", tools: ["Microsoft 365", "Google Workspace", "Notion", "Jira", "Confluence", "Asana"] },
+  { name: "Productivity", tools: ["Microsoft 365", "Excel", "Google Workspace", "Notion", "Jira", "Confluence", "Asana"] },
   { name: "Payments & Fintech", tools: ["Stripe", "Paystack", "Flutterwave", "MTN MoMo", "Airtel Money", "Zamtel Kwacha"] },
   { name: "Analytics & BI", tools: ["Power BI", "Tableau", "Looker", "Metabase", "PostHog"] },
   { name: "CRM & Sales", tools: ["HubSpot", "Salesforce", "Zoho CRM", "Pipedrive"] },
@@ -27,6 +28,31 @@ export const Route = createFileRoute("/integrations")({
   component: IntegrationsPage,
 });
 
+function ToolPill({ name }: { name: string }) {
+  const tool = getTool(name);
+  return (
+    <li className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs">
+      {tool.logo ? (
+        <img
+          src={tool.logo}
+          alt={`${tool.name} logo`}
+          loading="lazy"
+          decoding="async"
+          className="h-4 w-auto max-w-[22px] rounded-sm object-contain"
+        />
+      ) : (
+        <span
+          aria-hidden
+          className={`flex h-4 w-4 items-center justify-center rounded-sm text-[8px] font-bold ${tool.swatch ?? "bg-brand/15 text-brand"}`}
+        >
+          {tool.initials}
+        </span>
+      )}
+      {tool.name}
+    </li>
+  );
+}
+
 function IntegrationsPage() {
   return (
     <>
@@ -44,11 +70,7 @@ function IntegrationsPage() {
             <article key={c.name} className="rounded-2xl border border-border bg-card/40 p-6">
               <h3 className="font-display text-lg font-semibold">{c.name}</h3>
               <ul className="mt-4 flex flex-wrap gap-2">
-                {c.tools.map((t) => (
-                  <li key={t} className="rounded-full border border-border bg-background px-3 py-1 text-xs">
-                    {t}
-                  </li>
-                ))}
+                {c.tools.map((name) => <ToolPill key={name} name={name} />)}
               </ul>
             </article>
           ))}
