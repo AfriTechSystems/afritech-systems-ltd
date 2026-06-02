@@ -1,10 +1,37 @@
+import { getTool } from "@/lib/integrations";
+
 const TOOLS = [
   "n8n", "Zapier", "Make", "Supabase", "PostgreSQL", "Slack",
   "Microsoft 365", "Google Workspace", "Jira", "WhatsApp Business",
   "Twilio", "Stripe", "Paystack", "Flutterwave", "AWS",
   "Cloudflare", "Azure", "Notion", "HubSpot", "Salesforce",
-  "Power BI", "Tableau", "MongoDB", "Redis",
+  "Power BI", "Tableau", "MongoDB", "Redis", "Excel",
 ];
+
+function ToolChip({ name }: { name: string }) {
+  const tool = getTool(name);
+  return (
+    <span className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-border bg-background/70 px-4 py-2.5 text-sm font-medium text-foreground/90 backdrop-blur">
+      {tool.logo ? (
+        <img
+          src={tool.logo}
+          alt={`${tool.name} logo`}
+          loading="lazy"
+          decoding="async"
+          className="h-5 w-auto max-w-[28px] rounded-sm object-contain"
+        />
+      ) : (
+        <span
+          aria-hidden
+          className={`flex h-5 w-5 items-center justify-center rounded-sm text-[9px] font-bold ${tool.swatch ?? "bg-brand/15 text-brand"}`}
+        >
+          {tool.initials}
+        </span>
+      )}
+      {tool.name}
+    </span>
+  );
+}
 
 export function Integrations() {
   const list = [...TOOLS, ...TOOLS];
@@ -24,14 +51,8 @@ export function Integrations() {
         <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
         <div className="flex w-max gap-3 animate-marquee">
-          {list.map((t, i) => (
-            <span
-              key={`${t}-${i}`}
-              className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-border bg-background/70 px-5 py-3 text-sm font-medium text-foreground/90 backdrop-blur"
-            >
-              <span className="inline-block h-2 w-2 rounded-full bg-gradient-to-br from-brand to-brand-glow" />
-              {t}
-            </span>
+          {list.map((name, i) => (
+            <ToolChip key={`${name}-${i}`} name={name} />
           ))}
         </div>
       </div>

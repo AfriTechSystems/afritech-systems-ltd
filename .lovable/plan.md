@@ -1,88 +1,48 @@
-## 1. Mobile typography & logo
+# Implementation Plan
 
-- Remove the aggressive `html { font-size: 11px }` override in `src/styles.css` and replace with a milder `13px` baseline at ≤640px, `14.5px` at 641–768px, so hero/title/subtitle sizes return close to original but stay readable on small screens.
-- Tune Hero (`src/components/home/hero.tsx`) and `PageHero` mobile classes (e.g. `text-4xl` headings, `text-base` subtitles on small screens) so they look prominent again.
-- Logo: bump mobile size from `h-20` → `h-28` (`sm:h-28 md:h-32`) in `site-header.tsx`. Footer logo unchanged.
+## 1. Nav popup (mobile + desktop)
+File: `src/components/site-header.tsx`
+- Reduce header height: `h-28 sm:h-32` → `h-20 sm:h-24` (logo + hamburger sizes unchanged: `h-32 sm:h-36 md:h-40`).
+- Invert colors on the **popup card only** (header wrapper):
+  - Light mode → dark shady blue bg + light text: `bg-[#0F1B2D] text-white border-white/10`
+  - Dark mode → light/greyish bg + dark text: `dark:bg-slate-100 dark:text-slate-900 dark:border-slate-300`
+- Update child link/button hover classes to match (swap `hover:bg-accent` for `hover:bg-white/10` on light, `dark:hover:bg-slate-200`).
+- Logo: swap which logo shows so the visible one contrasts the new bg (light mode → dark bg → use `logoDark` white version; dark mode → light bg → use `logoLight` color version).
+- Mobile drawer + desktop dropdown popover inherit the same palette.
 
-## 2. Navigation polish
+## 2. Integration logos with alt text
+- Upload the 8 provided JPGs (n8n, Excel, Google Workspace, HubSpot, Salesforce, Slack, Stripe, Notion) via `lovable-assets` from `/mnt/user-uploads/` to `src/assets/integrations/*.asset.json`.
+- For tools without supplied logos (Zapier, Make, Supabase, PostgreSQL, Microsoft 365, Jira, WhatsApp, Twilio, Paystack, Flutterwave, AWS, Cloudflare, Azure, Power BI, Tableau, MongoDB, Redis) generate small clean SVG-style mark icons via `imagegen` (transparent PNG, ~256px, "on a clean white background") in batch.
+- Refactor `src/components/home/integrations.tsx`: replace the colored dot with a sized `<img src={logo} alt="<Tool> logo" className="h-5 w-auto object-contain" />`; chip becomes `gap-2 px-4 py-2.5` so logos sit neatly. Add `loading="lazy"` + `decoding="async"`.
+- Refactor `src/routes/integrations.tsx` category cards to render each tool as a pill: `<img className="h-4 w-auto" alt=… />` + name.
 
-- Reorder nav so **Articles comes after Integrations** in `src/lib/site.tsx` (`SIMPLE_NAV`, `NAV_GROUPS`) and `site-header.tsx`. Order: Home · Solutions · Industries · Integrations · Articles · About · Contact.
-- Keep current light/dark inverted color scheme (already correct).
+## 3. Admin allow-list fix
+- `ADMIN_EMAILS` secret is set to `hamwendamwando@gmail.com` (verified). The failure is the upsert call: in `src/lib/admin-access.functions.ts` the upsert relies on `onConflict: "user_id,role"`. Some schema variants list role as enum; the unique index may not be named exactly that. Make it bulletproof:
+  - First `select` existing role; only insert if missing (no upsert collision risk).
+  - Add explicit logging + return `reason` on failure paths.
+- Defensive: trim BOM/whitespace and compare lowercased — already done.
+- Verify `admin.tsx` flow still re-runs on `onAuthStateChange` (it does).
 
-## 3. Chatbot fix
+## 4. Alfred chatbot fix + rebrand
+File: `src/components/ai-chat.tsx` + `src/routes/api/chat.ts`
+- Rename label "AfriTech Sales · Online" → "AfriTech Assistant · Online"; aria-label "Chat with Alfred" stays; small chip "Ask Alfred" stays.
+- Ensure message text color always contrasts: `bg-muted text-foreground` already correct, but add explicit `text-slate-900 dark:text-slate-100` fallback on assistant bubble to avoid prose plugin overriding to a near-invisible color in some themes.
+- Fix empty-response: current handler returns `toUIMessageStreamResponse({ originalMessages })`. Drop the `originalMessages` option (it can produce empty stream when the client transport doesn't expect echoed history) and return `result.toUIMessageStreamResponse()` directly. Keep model `google/gemini-2.5-flash`.
+- Add inline actionable chips that DEEP-LINK: rewire FOLLOWUP_CHIPS to actual `<Link>` (Book → opens Calendly modal via BookCallButton, Pricing → `/solutions#pricing`, Case studies → `/#case-studies`, Talk to human → `mailto:enquiry@…`). Render as styled rounded buttons with brand colors.
+- Mobile: widen popup to `w-[94vw] max-w-[400px]`, increase input height `h-10 text-base` so typing is comfortable; ScrollArea uses `max-h-[60vh]`.
+- System prompt: append rule "When suggesting an action, end with a bracketed tag like [book], [pricing], [cases], [contact] so the UI can render a button." Then in `ai-chat.tsx`, parse trailing tags from assistant text and render matching action buttons under the bubble.
 
-- Diagnose: `useChat` with new `@ai-sdk/react` requires the server route to match the transport's UI message stream contract. Current code uses `result.toUIMessageStreamResponse({ originalMessages })` but the wrapped response from `withLovableAiGatewayRunIdHeader` may not preserve the streaming `Content-Type` / SSE headers properly, causing the client to silently get an empty response.
-- Fix `src/routes/api/chat.ts`:
-  - Validate messages, return the AI SDK UI message stream response directly (without the run-id wrapper for streaming) using the canonical pattern from the knowledge file.
-  - Add try/catch with a meaningful error response so failures surface in the UI.
-- Add visible error rendering in `ai-chat.tsx` (`error` from `useChat`) so future failures aren't silent.
+## 5. Card icons across the site → "drawing" style
+- Replace inline lucide icons inside feature cards (`solutions-suite.tsx`, `core-engine.tsx`, `industry-blueprint.tsx`, `three-steps.tsx`, `growth-promise.tsx`, etc.) with `lucide-react` icons rendered inside a soft circular badge: `bg-brand/10 text-brand ring-1 ring-brand/20 rounded-2xl p-3` and `strokeWidth={1.5}` for a hand-drawn feel. Add subtle `transition group-hover:scale-105`. No new dependencies; no animation libs. Keep payload tiny so performance stays good.
 
-## 4. Remove scroll widget
+## 6. SEO / indexing
+- `sitemap.xml.ts`: BASE_URL is `https://afritechsystemsltd.com` but the live site is `https://afritechsystemsltd.lovable.app` (custom domain not yet active per project URLs). Switch BASE_URL to `https://afritechsystemsltd.lovable.app` so Google's canonical/sitemap actually match the served host (fixes "Page with redirect").
+- Update `public/robots.txt` Sitemap directive to the same host.
+- Per-route `head()`: replace any hard-coded absolute canonical/og:url pointing to `afritechsystemsltd.com` with relative paths (`/about`, `/contact`, …) so they resolve to whichever host serves them. Keep `noindex,nofollow` on `/admin*` and `/login`.
 
-- Delete `src/components/scroll-progress.tsx` import + render from `src/routes/__root.tsx`. Keep only `AiChatWidget` in the bottom-right.
+## 7. Verification
+- Visual: load `/`, `/integrations`, `/admin`, open chat — confirm bg colors flip per theme, logos render with alt text, Alfred replies.
+- Functional: sign in as `hamwendamwando@gmail.com` → expect admin panel (not "Access pending").
+- Log check: `stack_modern--server-function-logs` after one chat round to confirm 200 stream.
 
-## 5. Admin access via Cloud secret allowlist
-
-- Add a new secret `ADMIN_EMAILS` (comma-separated list, e.g. `hamwendamwando@gmail.com,owner@afritechsystemsltd.com`). Request via the secrets tool.
-- Add a server function `ensureAdminAccess` (`src/lib/admin-access.functions.ts`) using `requireSupabaseAuth`. It reads the signed-in user's email, checks against `process.env.ADMIN_EMAILS`, and if matched, upserts an `admin` row into `public.user_roles` for that user via `supabaseAdmin`. Returns `{ isAdmin: boolean }`.
-- Update `src/routes/admin.tsx` and `src/routes/admin.articles.$id.tsx` to:
-  1. On mount, call `ensureAdminAccess()` first.
-  2. Then re-check `user_roles`.
-  3. Only show "Access pending" if neither secret nor DB role matches.
-- This means anyone signed in with an email in `ADMIN_EMAILS` is auto-granted admin on first visit — no SQL needed.
-
-## 6. Article publishing — full feature set
-
-### 6a. Storage bucket for article images (migration)
-
-- Create public storage bucket `article-images`.
-- RLS: anyone can read; only authenticated users with admin/editor role can insert/update/delete (using `has_role`).
-
-### 6b. Image upload + markdown image insertion in editor
-
-- Update `src/routes/admin.articles.$id.tsx`:
-  - Add an **"Upload cover image"** button next to the cover URL field — uploads selected file to `article-images/covers/{uuid}.{ext}`, returns public URL, sets `coverUrl`.
-  - Add an **"Insert image"** toolbar button above the markdown textarea — opens a small dialog asking for: file, alt text, optional caption. On confirm: upload to `article-images/inline/{uuid}.{ext}` and insert `![alt](url "caption")` markdown at the current cursor position (or end of body).
-  - Add an **SEO panel** (collapsible) below tags: SEO title (max 60), SEO description (max 160), OG image URL (defaults to cover). Stored as new columns `seo_title`, `seo_description`, `og_image` (migration adds them; defaults null).
-  - Live character counters on title/excerpt/SEO fields.
-
-### 6c. Articles index (`src/routes/articles.tsx`)
-
-- Fetch published articles from Supabase (already happens). If empty, render a clean empty state: "No articles published yet — check back soon." (with brand iconography).
-- Add a **search input** + **tag filter chips** (derived from union of all tags). Mobile: filters collapse into a `Sheet` triggered by a "Filter" button so the layout stays clean.
-- Card grid: cover image, tag pills, title, excerpt, "Read more →", date.
-
-### 6d. Article detail (`src/routes/articles.$slug.tsx`)
-
-- Professional reading layout: max-w-3xl, large display heading, cover hero image, author/date row, tag pills, reading-time estimate, prose-styled markdown body with `react-markdown` + `remark-gfm` (already installed). Images render full-width with captions from markdown title syntax.
-- Inject JSON-LD `Article` schema, per-route `head()` using `seo_title`/`seo_description`/`og_image` fields when present (falling back to title/excerpt/cover).
-- Sticky "Back to Articles" + "Share" buttons. Related articles strip at bottom (3 latest from same tag).
-
-### 6e. RLS verification
-
-- Existing policies on `articles` (admin/editor insert/update via `has_role`) plus the new admin-by-email auto-grant in §5 mean publishing works as soon as the user signs in with an allowlisted email — no manual SQL ever again.
-
-## 7. SEO & sitemap for afritechsystemsltd.com
-
-Google can't index the site because:
-- `sitemap.xml` and canonicals point to the `*.lovable.app` host, not the custom domain.
-- `robots.txt` advertises the wrong sitemap host.
-
-Fixes:
-- `src/routes/sitemap[.]xml.ts`: change `BASE_URL` to `https://afritechsystemsltd.com`.
-- `public/robots.txt`: update `Sitemap:` directive to `https://afritechsystemsltd.com/sitemap.xml`. Keep `Disallow: /admin`, `Disallow: /login`.
-- Add per-route absolute `canonical` + `og:url` pointing to `https://afritechsystemsltd.com{path}` in every route's `head()` (root + each page). Replace the lovable.app preview image with a stable public asset (use one of the brand logos in `public/`).
-- Add `meta robots noindex,nofollow` to `/admin`, `/admin/articles/$id`, `/login` (already present on admin — verify and add to login).
-- Confirm sitemap dynamically lists all published articles (already done).
-- Update `src/routes/__root.tsx` head defaults to use the custom domain.
-
-## 8. Verification
-
-- Build the site, then in preview: open chatbot and confirm a streamed response renders; open `/admin` while signed in as `hamwendamwando@gmail.com` and confirm auto-grant works; create + upload image + publish an article; visit `/articles` and `/articles/{slug}`; curl `/sitemap.xml` and `/robots.txt` to confirm they reference `afritechsystemsltd.com`.
-
-## Technical notes
-
-- Migration adds: `articles.seo_title text`, `articles.seo_description text`, `articles.og_image text`; storage bucket `article-images` with public read + role-gated write policies.
-- New secret: `ADMIN_EMAILS` (comma-separated).
-- No changes to `client.ts`, `client.server.ts`, `auth-middleware.ts`, `auth-attacher.ts`, `types.ts`, or `supabase/config.toml`.
-- Stack stays TanStack Start; no edge functions added.
+No DB migrations needed. No new npm deps.
