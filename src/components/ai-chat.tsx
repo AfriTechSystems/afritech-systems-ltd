@@ -40,9 +40,12 @@ export function AiChatWidget() {
   const [inputValue, setInputValue] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
     transport: chatTransport,
     id: "afritech-assistant",
+    onError: (err) => {
+      console.error("[AiChat] stream error", err);
+    },
   });
 
   const isLoading = status === "submitted" || status === "streaming";
@@ -170,6 +173,16 @@ export function AiChatWidget() {
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">Alfred is typing…</span>
                   </div>
+                </div>
+              )}
+
+              {error && (
+                <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                  <p className="font-semibold">Alfred couldn't reach the AI service.</p>
+                  <p className="mt-1 opacity-90">
+                    {error.message || "The chat backend returned an error."} In the meantime, email{" "}
+                    <a href="mailto:enquiry@afritechsystemsltd.com" className="underline">enquiry@afritechsystemsltd.com</a>.
+                  </p>
                 </div>
               )}
 
