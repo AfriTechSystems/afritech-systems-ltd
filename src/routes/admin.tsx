@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -41,43 +41,98 @@ interface ArticleRow {
   updated_at: string;
 }
 
+type AccessState =
+  | { kind: "loading" }
+  | { kind: "unauthenticated" }
+  | { kind: "denied"; email: string }
+  | { kind: "authorized"; userId: string; email: string }
+  | { kind: "error"; message: string; email?: string };
+
+async function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  return await Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timed out`)), ms)),
+  ]);
+}
+
 function AdminPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [tab, setTab] = useState<"leads" | "articles">("leads");
-  const [authed, setAuthed] = useState<null | { userId: string; email: string }>(null);
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [access, setAccess] = useState<AccessState>({ kind: "loading" });
+  const ranRef = useRef(false);
 
   useEffect(() => {
-    const check = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
-        navigate({ to: "/login", replace: true });
-        return;
-      }
-      setAuthed({ userId: data.user.id, email: data.user.email ?? "" });
-      // Auto-grant admin to allow-listed emails (ADMIN_EMAILS secret) via server fn.
+    let cancelled = false;
+
+    async function resolveAccess() {
       try {
-        const { ensureAdminAccess } = await import("@/lib/admin-access.functions");
-        const res = await ensureAdminAccess();
-        setIsAdmin(!!res.isAdmin);
+        const { data, error } = await withTimeout(
+          supabase.auth.getUser(),
+          8000,
+          "Auth check",
+        );
+        if (cancelled) return;
+        if (error) {
+          setAccess({ kind: "error", message: error.message });
+          return;
+        }
+        if (!data.user) {
+          setAccess({ kind: "unauthenticated" });
+          return;
+        }
+        const email = data.user.email ?? "";
+        const userId = data.user.id;
+
+        // Try server-side allowlist grant; fall back to direct role read.
+        let isAdmin = false;
+        try {
+          const { ensureAdminAccess } = await import("@/lib/admin-access.functions");
+          const res = await withTimeout(ensureAdminAccess(), 8000, "Admin check");
+          isAdmin = !!res.isAdmin;
+        } catch (e) {
+          console.error("[admin] ensureAdminAccess failed, falling back to direct query", e);
+          const { data: roles } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", userId);
+          isAdmin = (roles ?? []).some((r) => r.role === "admin" || r.role === "editor");
+        }
+        if (cancelled) return;
+        setAccess(
+          isAdmin
+            ? { kind: "authorized", userId, email }
+            : { kind: "denied", email },
+        );
       } catch (e) {
-        console.error("ensureAdminAccess failed", e);
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", data.user.id);
-        setIsAdmin((roles ?? []).some((r) => r.role === "admin" || r.role === "editor"));
+        if (cancelled) return;
+        const msg = e instanceof Error ? e.message : "Unknown error";
+        setAccess({ kind: "error", message: msg });
       }
+    }
+
+    if (!ranRef.current) {
+      ranRef.current = true;
+      resolveAccess();
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event) => {
+      ranRef.current = false;
+      setAccess({ kind: "loading" });
+      ranRef.current = true;
+      resolveAccess();
+    });
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
     };
-    check();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => check());
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, []);
+
+  const isAuthorized = access.kind === "authorized";
 
   const leadsQ = useQuery({
     queryKey: ["admin", "leads"],
-    enabled: !!isAdmin,
+    enabled: isAuthorized,
     queryFn: async (): Promise<Lead[]> => {
       const { data, error } = await supabase
         .from("leads")
@@ -90,7 +145,7 @@ function AdminPage() {
 
   const articlesQ = useQuery({
     queryKey: ["admin", "articles"],
-    enabled: !!isAdmin,
+    enabled: isAuthorized,
     queryFn: async (): Promise<ArticleRow[]> => {
       const { data, error } = await supabase
         .from("articles")
@@ -154,15 +209,45 @@ function AdminPage() {
     URL.revokeObjectURL(url);
   }
 
-  if (!authed) return <div className="px-4 py-20 text-center text-muted-foreground">Checking access…</div>;
+  if (access.kind === "loading") {
+    return (
+      <div className="px-4 py-20 text-center text-muted-foreground">Checking access…</div>
+    );
+  }
 
-  if (isAdmin === false) {
+  if (access.kind === "unauthenticated") {
+    return (
+      <section className="mx-auto max-w-md px-4 py-20 text-center">
+        <h1 className="font-display text-2xl font-bold">Sign in required</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          You need to sign in to access the AfriTech admin portal.
+        </p>
+        <Link to="/login" className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-brand-foreground shadow-glow">
+          Go to sign in
+        </Link>
+      </section>
+    );
+  }
+
+  if (access.kind === "error") {
+    return (
+      <section className="mx-auto max-w-md px-4 py-20 text-center">
+        <h1 className="font-display text-2xl font-bold">Admin check failed</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{access.message}</p>
+        <button onClick={() => location.reload()} className="mt-6 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-brand-foreground">
+          Try again
+        </button>
+      </section>
+    );
+  }
+
+  if (access.kind === "denied") {
     return (
       <section className="mx-auto max-w-md px-4 py-20 text-center">
         <h1 className="font-display text-2xl font-bold">Access pending</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          You're signed in as <strong>{authed.email}</strong> but this email isn't on the admin allow list.
-          Ask an existing admin to add <code className="rounded bg-muted px-1.5 py-0.5">{authed.email}</code> to the{" "}
+          You're signed in as <strong>{access.email}</strong> but this email isn't on the admin allow list.
+          Ask an existing admin to add <code className="rounded bg-muted px-1.5 py-0.5">{access.email}</code> to the{" "}
           <code className="rounded bg-muted px-1.5 py-0.5">ADMIN_EMAILS</code> secret in Lovable Cloud, then refresh.
         </p>
         <button onClick={signOut} className="mt-6 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-accent">
@@ -174,7 +259,7 @@ function AdminPage() {
 
   return (
     <>
-      <PageHero eyebrow="Admin" title="AfriTech Control Centre" description={`Signed in as ${authed.email}`} />
+      <PageHero eyebrow="Admin" title="AfriTech Control Centre" description={`Signed in as ${access.email}`} />
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex gap-2 rounded-lg bg-muted p-1">

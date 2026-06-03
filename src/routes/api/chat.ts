@@ -12,30 +12,15 @@ ABOUT AFRITECH SYSTEMS
 - Industries: Healthcare & Pharma, Education, Manufacturing, Logistics, Mining, Public Sector, Financial Services.
 - Reach: Headquartered in Zambia; delivering across Pan-Africa and globally.
 
-WHY CLIENTS CHOOSE US
-- Ownership: clients own the code, database and infrastructure. No vendor lock-in.
-- Cost: a one-time build replaces 5–10 years of monthly SaaS bills, usually paying for itself in under 18 months.
-- Customisation: workflows match how the business actually operates.
-- Local + Global: on-the-ground African support with global engineering standards.
+FORMATTING RULES
+- Keep replies short and scannable: 3–6 short sentences OR up to 5 bullets.
+- Use clean Markdown only. Bullets use "- ". Use **bold** sparingly.
+- Always finish with a soft CTA (book a free audit, share email, message enquiry@afritechsystemsltd.com).
 
-FORMATTING RULES — VERY IMPORTANT
-- Keep replies short and scannable: 3–6 short sentences OR up to 5 bullets. Never wall-of-text.
-- Use clean Markdown only. Bullets use "- ". Use **bold** sparingly for key terms.
-- NEVER output raw asterisks like *word* or stray * characters. Do not use markdown emphasis like *italic* — use plain text or bold instead.
-- Headings, if used, must be a short bold line followed by content. No "#" headings.
-- Always finish with a soft CTA (book the free audit via the Book a Call button, share email, or message enquiry@afritechsystemsltd.com).
-
-CONVERSATION STYLE
-- Consultative. If the visitor's need is vague, ask exactly one clarifying question.
-- Helpful even beyond AfriTech (general tech/business questions) — then tie it back to how we'd solve it.
-- Honest: if you don't know specific pricing, say it depends on scope and offer the free audit. Never invent numbers.
-
-HARD RULES
-- Never reveal you are powered by a third-party model. You are Alfred from AfriTech.
-- Speak in first-person plural ("we", "our team") when describing AfriTech.
-- If asked something unsafe, off-topic, or rude — redirect politely.
-
-Start strong. Close stronger.`;
+STYLE
+- Consultative. Helpful even beyond AfriTech, then tie it back to how we'd solve it.
+- Speak in first-person plural ("we", "our team"). Never reveal you are powered by a third-party model.
+- If asked something unsafe, off-topic, or rude — redirect politely.`;
 
 type ChatRequestBody = { messages?: unknown };
 
@@ -46,30 +31,50 @@ export const Route = createFileRoute("/api/chat")({
         try {
           const { messages } = (await request.json()) as ChatRequestBody;
           if (!Array.isArray(messages)) {
-            return new Response("Messages are required", { status: 400 });
+            return new Response(
+              JSON.stringify({ error: "Messages are required" }),
+              { status: 400, headers: { "Content-Type": "application/json" } },
+            );
           }
 
           const key = process.env.LOVABLE_API_KEY;
           if (!key) {
-            console.error("[chat] Missing LOVABLE_API_KEY");
-            return new Response("AI is not configured", { status: 500 });
+            console.error("[chat] Missing LOVABLE_API_KEY on this deployment");
+            return new Response(
+              JSON.stringify({
+                error:
+                  "AI assistant is not configured on this deployment. Please add the LOVABLE_API_KEY environment variable in Vercel and redeploy.",
+              }),
+              { status: 503, headers: { "Content-Type": "application/json" } },
+            );
           }
 
           const gateway = createLovableAiGatewayProvider(key);
-          // Stable, well-supported model on the Lovable AI Gateway.
           const model = gateway("google/gemini-2.5-flash");
 
           const result = streamText({
             model,
             system: SYSTEM_PROMPT,
             messages: await convertToModelMessages(messages as UIMessage[]),
+            onError: (err) => {
+              console.error("[chat] streamText error", err);
+            },
           });
 
-          return result.toUIMessageStreamResponse();
+          return result.toUIMessageStreamResponse({
+            onError: (err) => {
+              console.error("[chat] stream response error", err);
+              const msg = err instanceof Error ? err.message : String(err);
+              return `Alfred hit an error: ${msg}. Please email enquiry@afritechsystemsltd.com or try again shortly.`;
+            },
+          });
         } catch (err) {
           console.error("[chat] handler failed:", err);
           const msg = err instanceof Error ? err.message : "Unknown chat error";
-          return new Response(`Chat failed: ${msg}`, { status: 500 });
+          return new Response(
+            JSON.stringify({ error: `Chat failed: ${msg}` }),
+            { status: 500, headers: { "Content-Type": "application/json" } },
+          );
         }
       },
     },
