@@ -1,48 +1,74 @@
-# Implementation Plan
+## Failing SEO findings found
 
-## 1. Nav popup (mobile + desktop)
-File: `src/components/site-header.tsx`
-- Reduce header height: `h-28 sm:h-32` → `h-20 sm:h-24` (logo + hamburger sizes unchanged: `h-32 sm:h-36 md:h-40`).
-- Invert colors on the **popup card only** (header wrapper):
-  - Light mode → dark shady blue bg + light text: `bg-[#0F1B2D] text-white border-white/10`
-  - Dark mode → light/greyish bg + dark text: `dark:bg-slate-100 dark:text-slate-900 dark:border-slate-300`
-- Update child link/button hover classes to match (swap `hover:bg-accent` for `hover:bg-white/10` on light, `dark:hover:bg-slate-200`).
-- Logo: swap which logo shows so the visible one contrasts the new bg (light mode → dark bg → use `logoDark` white version; dark mode → light bg → use `logoLight` color version).
-- Mobile drawer + desktop dropdown popover inherit the same palette.
+1. **Sitemap needs attention** — scanner saw missing sitemap coverage for `/articles/$slug` plus non-indexable/internal routes like `/admin`, `/login`, `/api/audit-lead`, and `/api/chat`.
+2. **Page loads slowly** — published homepage LCP needs optimization, especially the hero image/headline.
+3. **Accessibility barriers** — some text has weak contrast against its background.
+4. **Heading and image descriptions could be clearer** — homepage H1 should describe Enterprise Automation more explicitly; integration image alt text is too generic.
+5. **Titles and descriptions exceed length limits** — integrations title and solutions/integrations/contact descriptions are too long.
+6. **Google Search Console is not fully set up** — Search Console connector/verification/sitemap submission still needs completing.
 
-## 2. Integration logos with alt text
-- Upload the 8 provided JPGs (n8n, Excel, Google Workspace, HubSpot, Salesforce, Slack, Stripe, Notion) via `lovable-assets` from `/mnt/user-uploads/` to `src/assets/integrations/*.asset.json`.
-- For tools without supplied logos (Zapier, Make, Supabase, PostgreSQL, Microsoft 365, Jira, WhatsApp, Twilio, Paystack, Flutterwave, AWS, Cloudflare, Azure, Power BI, Tableau, MongoDB, Redis) generate small clean SVG-style mark icons via `imagegen` (transparent PNG, ~256px, "on a clean white background") in batch.
-- Refactor `src/components/home/integrations.tsx`: replace the colored dot with a sized `<img src={logo} alt="<Tool> logo" className="h-5 w-auto object-contain" />`; chip becomes `gap-2 px-4 py-2.5` so logos sit neatly. Add `loading="lazy"` + `decoding="async"`.
-- Refactor `src/routes/integrations.tsx` category cards to render each tool as a pill: `<img className="h-4 w-auto" alt=… />` + name.
+## Implementation plan
 
-## 3. Admin allow-list fix
-- `ADMIN_EMAILS` secret is set to `hamwendamwando@gmail.com` (verified). The failure is the upsert call: in `src/lib/admin-access.functions.ts` the upsert relies on `onConflict: "user_id,role"`. Some schema variants list role as enum; the unique index may not be named exactly that. Make it bulletproof:
-  - First `select` existing role; only insert if missing (no upsert collision risk).
-  - Add explicit logging + return `reason` on failure paths.
-- Defensive: trim BOM/whitespace and compare lowercased — already done.
-- Verify `admin.tsx` flow still re-runs on `onAuthStateChange` (it does).
+### 1. Fix chatbot blank responses on deployed Vercel domain
+- Inspect the `/api/chat` route for production deployment compatibility.
+- Keep Lovable AI calls server-side, but add deployment-safe diagnostics and user-facing error handling so blank streams become visible failures instead of empty assistant bubbles.
+- Change the chat UI so if a streamed assistant message has no text after completion, it shows a helpful error and allows retry.
+- Use the stable `google/gemini-2.5-flash` model already chosen, and keep returning a direct AI SDK streaming response.
+- Check whether the deployed Vercel environment likely lacks `LOVABLE_API_KEY`; if so, surface a clear “AI is not configured on this deployment” message in the widget instead of a blank response.
 
-## 4. Alfred chatbot fix + rebrand
-File: `src/components/ai-chat.tsx` + `src/routes/api/chat.ts`
-- Rename label "AfriTech Sales · Online" → "AfriTech Assistant · Online"; aria-label "Chat with Alfred" stays; small chip "Ask Alfred" stays.
-- Ensure message text color always contrasts: `bg-muted text-foreground` already correct, but add explicit `text-slate-900 dark:text-slate-100` fallback on assistant bubble to avoid prose plugin overriding to a near-invisible color in some themes.
-- Fix empty-response: current handler returns `toUIMessageStreamResponse({ originalMessages })`. Drop the `originalMessages` option (it can produce empty stream when the client transport doesn't expect echoed history) and return `result.toUIMessageStreamResponse()` directly. Keep model `google/gemini-2.5-flash`.
-- Add inline actionable chips that DEEP-LINK: rewire FOLLOWUP_CHIPS to actual `<Link>` (Book → opens Calendly modal via BookCallButton, Pricing → `/solutions#pricing`, Case studies → `/#case-studies`, Talk to human → `mailto:enquiry@…`). Render as styled rounded buttons with brand colors.
-- Mobile: widen popup to `w-[94vw] max-w-[400px]`, increase input height `h-10 text-base` so typing is comfortable; ScrollArea uses `max-h-[60vh]`.
-- System prompt: append rule "When suggesting an action, end with a bracketed tag like [book], [pricing], [cases], [contact] so the UI can render a button." Then in `ai-chat.tsx`, parse trailing tags from assistant text and render matching action buttons under the bubble.
+### 2. Fix admin portal stuck on “Checking access…”
+- Refactor `src/routes/admin.tsx` so auth/admin checking always reaches a final state.
+- Add `loading`, `unauthenticated`, `authorized`, `denied`, and `error` states instead of relying on `authed === null` forever.
+- Add timeout/error handling around `supabase.auth.getUser()` and `ensureAdminAccess()` so the page cannot hang indefinitely.
+- Preserve the noindex metadata for `/admin`.
+- If admin access still fails, show the signed-in email and a clear reason rather than endless “Checking access…”.
 
-## 5. Card icons across the site → "drawing" style
-- Replace inline lucide icons inside feature cards (`solutions-suite.tsx`, `core-engine.tsx`, `industry-blueprint.tsx`, `three-steps.tsx`, `growth-promise.tsx`, etc.) with `lucide-react` icons rendered inside a soft circular badge: `bg-brand/10 text-brand ring-1 ring-brand/20 rounded-2xl p-3` and `strokeWidth={1.5}` for a hand-drawn feel. Add subtle `transition group-hover:scale-105`. No new dependencies; no animation libs. Keep payload tiny so performance stays good.
+### 3. Make nav popup and footer white
+- Update `src/components/site-header.tsx` so the desktop dropdown popup and mobile drawer are white in both light and dark modes.
+- Keep current logo and hamburger sizing.
+- Adjust link text/hover styles inside the popup/drawer for strong contrast on white.
+- Update `src/components/site-footer.tsx` to use a white/light background in both modes, with readable text and borders.
 
-## 6. SEO / indexing
-- `sitemap.xml.ts`: BASE_URL is `https://afritechsystemsltd.com` but the live site is `https://afritechsystemsltd.lovable.app` (custom domain not yet active per project URLs). Switch BASE_URL to `https://afritechsystemsltd.lovable.app` so Google's canonical/sitemap actually match the served host (fixes "Page with redirect").
-- Update `public/robots.txt` Sitemap directive to the same host.
-- Per-route `head()`: replace any hard-coded absolute canonical/og:url pointing to `afritechsystemsltd.com` with relative paths (`/about`, `/contact`, …) so they resolve to whichever host serves them. Keep `noindex,nofollow` on `/admin*` and `/login`.
+### 4. Replace homepage hero animation with uploaded hero image
+- Upload `hero page.jpg` through Lovable Assets.
+- Replace `PipelineVisualizer` in `src/components/home/hero.tsx` with a responsive optimized `<img>` using the uploaded asset.
+- Add descriptive alt text, explicit dimensions, `fetchPriority="high"`, eager loading, and a preload link in the homepage route for LCP performance.
+- Update the homepage H1 to include the requested SEO descriptor, e.g. “SYSTEMS REIMAGINED — Enterprise Automation for Africa”.
 
-## 7. Verification
-- Visual: load `/`, `/integrations`, `/admin`, open chat — confirm bg colors flip per theme, logos render with alt text, Alfred replies.
-- Functional: sign in as `hamwendamwando@gmail.com` → expect admin panel (not "Access pending").
-- Log check: `stack_modern--server-function-logs` after one chat round to confirm 200 stream.
+### 5. Replace case-study images with uploaded images
+- Upload the attached pharmacy, school ERP, and logistics images through Lovable Assets.
+- Update `src/components/home/case-studies.tsx` to use:
+  - Pharmacy image for Pharma Distribution
+  - School ERP image for Education
+  - Logistics image for Logistics SME
+- Add descriptive alt text for each image and keep responsive aspect-ratio styling for mobile.
 
-No DB migrations needed. No new npm deps.
+### 6. Make integration icons visible and improve alt text
+- Update the logo containers in `src/components/home/integrations.tsx` and `src/routes/integrations.tsx` so JPG logos show on both light/dark backgrounds with a white chip/background where needed.
+- Replace generic “logo” alt text with descriptive alt text such as “Slack team communication platform” or “Microsoft Excel spreadsheet integration”.
+- Keep lazy loading for non-hero integration images.
+
+### 7. Fix sitemap/indexability without indexing private/API routes
+- Keep `/admin` and `/login` blocked/noindexed as requested previously.
+- Do **not** add `/api/chat` or `/api/audit-lead` to the sitemap because API endpoints should not be indexed.
+- Confirm dynamic article URLs are generated one per published article; if needed, strengthen the sitemap route and mark the stale finding fixed with an explanation.
+- Keep public pages indexable: `/`, `/solutions`, `/industries`, `/integrations`, `/articles`, published `/articles/<slug>`, `/about`, `/contact`.
+- Update robots/sitemap domain consistently for the live custom domain `https://afritechsystemsltd.com` if that is now the launched primary domain.
+
+### 8. Fix SEO metadata and accessibility findings
+- Shorten route metadata:
+  - integrations title under 60 characters
+  - solutions/integrations/contact descriptions under 160 characters
+- Improve low-contrast text where scanner findings point to muted text on light sections, especially footer/nav/card areas being changed.
+- Keep single-H1 route structure intact.
+- Mark addressed SEO findings as fixed after code changes.
+
+### 9. Semrush/Search Console next step
+- Semrush helps with keyword/competitive SEO, but the listed failing setup issue is Google Search Console, not Semrush.
+- If the Google Search Console connector is available/connected, proceed with verification/submission; otherwise surface that it must be connected so the sitemap can be submitted and search data tracked.
+
+## Verification
+- Check admin page no longer hangs and shows an actionable state.
+- Check chat errors are visible on deployed-domain failures instead of blank responses.
+- Confirm hero/case-study/integration images render with alt text and responsive sizing.
+- Mark fixed SEO findings in the SEO panel and suggest a rescan after publishing.
