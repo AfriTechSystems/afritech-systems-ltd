@@ -13,17 +13,19 @@ function ToolChip({ name }: { name: string }) {
   return (
     <span className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-border bg-background/70 px-4 py-2.5 text-sm font-medium text-foreground/90 backdrop-blur">
       {tool.logo ? (
-        <img
-          src={tool.logo}
-          alt={`${tool.name} logo`}
-          loading="lazy"
-          decoding="async"
-          className="h-5 w-auto max-w-[28px] rounded-sm object-contain"
-        />
+        <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white p-1 ring-1 ring-slate-200">
+          <img
+            src={tool.logo}
+            alt={`${tool.name} integration for AfriTech automation`}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-contain"
+          />
+        </span>
       ) : (
         <span
           aria-hidden
-          className={`flex h-5 w-5 items-center justify-center rounded-sm text-[9px] font-bold ${tool.swatch ?? "bg-brand/15 text-brand"}`}
+          className={`flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-bold ${tool.swatch ?? "bg-brand/15 text-brand"}`}
         >
           {tool.initials}
         </span>

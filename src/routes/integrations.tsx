@@ -17,8 +17,8 @@ const CATEGORIES = [
 export const Route = createFileRoute("/integrations")({
   head: () => ({
     meta: [
-      { title: "Automation Integrations — n8n, Zapier, Supabase & 500+ tools | AfriTech Systems" },
-      { name: "description", content: "AfriTech Systems integrates with n8n, Zapier, Make, Supabase, Microsoft 365, Google Workspace, Stripe, Paystack, Flutterwave and 500+ enterprise tools." },
+      { title: "Integrations — AfriTech Systems" },
+      { name: "description", content: "AfriTech integrates with n8n, Zapier, Supabase, Microsoft 365, Stripe, Paystack and 500+ enterprise tools across Africa." },
       { property: "og:title", content: "Integrations — AfriTech Systems" },
       { property: "og:description", content: "Plug AfriTech into the automation, data and payments tools your enterprise already runs." },
       { property: "og:url", content: "/integrations" },
@@ -33,17 +33,19 @@ function ToolPill({ name }: { name: string }) {
   return (
     <li className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs">
       {tool.logo ? (
-        <img
-          src={tool.logo}
-          alt={`${tool.name} logo`}
-          loading="lazy"
-          decoding="async"
-          className="h-4 w-auto max-w-[22px] rounded-sm object-contain"
-        />
+        <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-white p-0.5 ring-1 ring-slate-200">
+          <img
+            src={tool.logo}
+            alt={`${tool.name} integration with AfriTech Systems`}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-contain"
+          />
+        </span>
       ) : (
         <span
           aria-hidden
-          className={`flex h-4 w-4 items-center justify-center rounded-sm text-[8px] font-bold ${tool.swatch ?? "bg-brand/15 text-brand"}`}
+          className={`flex h-5 w-5 items-center justify-center rounded-sm text-[8px] font-bold ${tool.swatch ?? "bg-brand/15 text-brand"}`}
         >
           {tool.initials}
         </span>

@@ -12,7 +12,7 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact AfriTech Systems — Lusaka, Zambia" },
-      { name: "description", content: "Talk to AfriTech Systems about ERP, school management or industrial automation. Email enquiry@afritechsystemsltd.com or call +260 969 071 139." },
+      { name: "description", content: "Talk to AfriTech Systems about ERP, school management or industrial automation. Email or call our Lusaka office today." },
       { property: "og:title", content: "Contact AfriTech Systems" },
       { property: "og:description", content: "Book a free systems audit with AfriTech Systems Limited." },
       { property: "og:url", content: "https://afritechsystemsltd.com/contact" },

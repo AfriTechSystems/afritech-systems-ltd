@@ -1,25 +1,28 @@
 import { ArrowRight, TrendingUp } from "lucide-react";
-import pharmaImg from "@/assets/cases/pharma.jpg";
-import schoolImg from "@/assets/cases/school.jpg";
-import logisticsImg from "@/assets/cases/logistics.jpg";
+import pharmaAsset from "@/assets/cases/pharmacy-app.jpg.asset.json";
+import schoolAsset from "@/assets/cases/school-erp.jpg.asset.json";
+import logisticsAsset from "@/assets/cases/logistics-network.jpg.asset.json";
 
 const CASES = [
   {
-    img: pharmaImg,
+    img: pharmaAsset.url,
+    alt: "Pharmacy mobile app showing medicine delivery, prescription upload and inventory dashboard",
     sector: "Pharma Distribution",
     title: "From stock sheets to a live ERP",
     body: "A regional pharma distributor replaced 14 spreadsheets with one connected system. Stock-outs dropped, orders ship 38% faster.",
     metric: "+38% faster fulfilment",
   },
   {
-    img: schoolImg,
+    img: schoolAsset.url,
+    alt: "School ERP software dashboard showing students, teachers, attendance and fee collection analytics",
     sector: "Education",
     title: "A parent portal for 12,000 learners",
     body: "A private school group moved paper records to an online portal. Parents see grades, attendance and fees in real time.",
     metric: "12,000+ learners online",
   },
   {
-    img: logisticsImg,
+    img: logisticsAsset.url,
+    alt: "Global logistics illustration with truck, ship, plane and train connected around a world map",
     sector: "Logistics SME",
     title: "WhatsApp dispatch → smart routing",
     body: "A logistics firm swapped WhatsApp messages for an automated routing dashboard. Drivers get clear daily runs and live tracking.",
@@ -50,10 +53,11 @@ export function CaseStudies() {
               <div className="aspect-[16/10] overflow-hidden bg-muted">
                 <img
                   src={c.img}
-                  alt={c.title}
+                  alt={c.alt}
                   width={1280}
                   height={800}
                   loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>

@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const BASE_URL = "https://afritechsystemsltd.lovable.app";
+// Use the live custom domain so Google's canonical chain stays clean.
+const BASE_URL = "https://afritechsystemsltd.com";
 
 interface SitemapEntry {
   path: string;
@@ -15,14 +16,16 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
+        // Public, indexable routes only.
+        // /admin, /login, and /api/* are deliberately excluded (noindex / API).
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/solutions", changefreq: "monthly", priority: "0.9" },
           { path: "/industries", changefreq: "monthly", priority: "0.9" },
           { path: "/integrations", changefreq: "monthly", priority: "0.8" },
+          { path: "/articles", changefreq: "weekly", priority: "0.8" },
           { path: "/about", changefreq: "monthly", priority: "0.7" },
           { path: "/contact", changefreq: "monthly", priority: "0.8" },
-          { path: "/articles", changefreq: "weekly", priority: "0.8" },
         ];
 
         try {
