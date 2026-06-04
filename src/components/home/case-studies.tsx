@@ -1,7 +1,7 @@
 import { ArrowRight, TrendingUp } from "lucide-react";
-import pharmaAsset from "@/assets/cases/pharmacy-app.jpg.asset.json";
-import schoolAsset from "@/assets/cases/school-erp.jpg.asset.json";
-import logisticsAsset from "@/assets/cases/logistics-network.jpg.asset.json";
+const pharmaAsset = { url: "/img/cases/pharmacy-app.jpg" };
+const schoolAsset = { url: "/img/cases/school-erp.jpg" };
+const logisticsAsset = { url: "/img/cases/logistics-network.jpg" };
 
 const CASES = [
   {

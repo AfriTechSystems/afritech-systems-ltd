@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { BookCallButton } from "@/components/book-call-button";
-import heroImageAsset from "@/assets/hero/hero-collaboration.jpg.asset.json";
+const heroImageAsset = { url: "/img/hero/hero-collaboration.jpg" };
 
 export function Hero() {
   return (
