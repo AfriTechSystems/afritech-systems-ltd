@@ -1,12 +1,3 @@
-import n8nLogo from "@/assets/integrations/n8n.jpg.asset.json";
-import excelLogo from "@/assets/integrations/Excel.jpg.asset.json";
-import gwsLogo from "@/assets/integrations/Google_Workspace.jpg.asset.json";
-import hubspotLogo from "@/assets/integrations/Hubspot.jpg.asset.json";
-import salesforceLogo from "@/assets/integrations/Salesforce.jpg.asset.json";
-import slackLogo from "@/assets/integrations/Slack.jpg.asset.json";
-import stripeLogo from "@/assets/integrations/Stripe.jpg.asset.json";
-import notionLogo from "@/assets/integrations/Notion_Logo.jpg.asset.json";
-
 export type IntegrationTool = {
   name: string;
   logo?: string;
@@ -29,14 +20,14 @@ const t = (name: string, logo?: string, swatch?: string): IntegrationTool => ({
 });
 
 export const INTEGRATION_TOOLS: Record<string, IntegrationTool> = {
-  n8n: t("n8n", n8nLogo.url),
-  Excel: t("Microsoft Excel", excelLogo.url),
-  "Google Workspace": t("Google Workspace", gwsLogo.url),
-  HubSpot: t("HubSpot", hubspotLogo.url),
-  Salesforce: t("Salesforce", salesforceLogo.url),
-  Slack: t("Slack", slackLogo.url),
-  Stripe: t("Stripe", stripeLogo.url),
-  Notion: t("Notion", notionLogo.url),
+  n8n: t("n8n", "/img/integrations/n8n.jpg"),
+  Excel: t("Microsoft Excel", "/img/integrations/Excel.jpg"),
+  "Google Workspace": t("Google Workspace", "/img/integrations/Google_Workspace.jpg"),
+  HubSpot: t("HubSpot", "/img/integrations/Hubspot.jpg"),
+  Salesforce: t("Salesforce", "/img/integrations/Salesforce.jpg"),
+  Slack: t("Slack", "/img/integrations/Slack.jpg"),
+  Stripe: t("Stripe", "/img/integrations/Stripe.jpg"),
+  Notion: t("Notion", "/img/integrations/Notion_Logo.jpg"),
   // Fallbacks (clean colored monogram)
   Zapier: t("Zapier", undefined, "bg-orange-500 text-white"),
   Make: t("Make", undefined, "bg-fuchsia-600 text-white"),
