@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import ogImage from "../assets/og-image.jpg";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { AiChatWidget } from "@/components/ai-chat";
@@ -63,8 +64,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: SITE.name },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:image", content: `${SITE_URL}/favicon.png` },
-      { name: "twitter:image", content: `${SITE_URL}/favicon.png` },
+      { property: "og:image", content: `${SITE_URL}${ogImage}` },
+      { name: "twitter:image", content: `${SITE_URL}${ogImage}` },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

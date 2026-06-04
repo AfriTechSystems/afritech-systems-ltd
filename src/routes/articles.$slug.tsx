@@ -33,16 +33,39 @@ async function fetchArticle(slug: string): Promise<ArticleFull | null> {
 }
 
 export const Route = createFileRoute("/articles/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `Article — AfriTech Systems` },
+  loader: async ({ params, context }) => {
+    const article = await context.queryClient.ensureQueryData({
+      queryKey: ["article", params.slug],
+      queryFn: () => fetchArticle(params.slug),
+    });
+    return { article };
+  },
+  head: ({ params, loaderData }) => {
+    const a = loaderData?.article;
+    const rawTitle = a?.seo_title || a?.title;
+    const title = rawTitle ? `${rawTitle} — AfriTech Systems`.slice(0, 60) : "Article — AfriTech Systems";
+    const description = (a?.seo_description || a?.excerpt || "Insights from AfriTech Systems on enterprise automation in Africa.").slice(0, 160);
+    const url = `https://afritechsystemsltd.com/articles/${params.slug}`;
+    const image = a?.og_image || a?.cover_url || undefined;
+    const meta = [
+      { title },
+      { name: "description", content: description },
       { property: "og:type", content: "article" },
-      { property: "og:url", content: `https://afritechsystemsltd.com/articles/${params.slug}` },
-    ],
-    links: [
-      { rel: "canonical", href: `https://afritechsystemsltd.com/articles/${params.slug}` },
-    ],
-  }),
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:url", content: url },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+    ];
+    if (image) {
+      meta.push({ property: "og:image", content: image });
+      meta.push({ name: "twitter:image", content: image });
+    }
+    return {
+      meta,
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: ArticlePage,
 });
 
