@@ -58,14 +58,11 @@ async function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise
 function AdminPage() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isArticleEditorRoute = pathname.startsWith("/admin/articles/");
   const qc = useQueryClient();
   const [tab, setTab] = useState<"leads" | "articles">("leads");
   const [access, setAccess] = useState<AccessState>({ kind: "loading" });
   const ranRef = useRef(false);
-
-  if (pathname.startsWith("/admin/articles/")) {
-    return <Outlet />;
-  }
 
   useEffect(() => {
     let cancelled = false;
@@ -137,7 +134,7 @@ function AdminPage() {
 
   const leadsQ = useQuery({
     queryKey: ["admin", "leads"],
-    enabled: isAuthorized,
+    enabled: isAuthorized && !isArticleEditorRoute,
     queryFn: async (): Promise<Lead[]> => {
       const { data, error } = await supabase
         .from("leads")
@@ -150,7 +147,7 @@ function AdminPage() {
 
   const articlesQ = useQuery({
     queryKey: ["admin", "articles"],
-    enabled: isAuthorized,
+    enabled: isAuthorized && !isArticleEditorRoute,
     queryFn: async (): Promise<ArticleRow[]> => {
       const { data, error } = await supabase
         .from("articles")
