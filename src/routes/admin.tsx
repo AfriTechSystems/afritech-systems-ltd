@@ -211,6 +211,10 @@ function AdminPage() {
     URL.revokeObjectURL(url);
   }
 
+  if (isArticleEditorRoute && isAuthorized) {
+    return <Outlet />;
+  }
+
   if (access.kind === "loading") {
     return (
       <div className="px-4 py-20 text-center text-muted-foreground">Checking access…</div>
