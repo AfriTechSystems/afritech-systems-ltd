@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,10 +57,15 @@ async function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise
 
 function AdminPage() {
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const qc = useQueryClient();
   const [tab, setTab] = useState<"leads" | "articles">("leads");
   const [access, setAccess] = useState<AccessState>({ kind: "loading" });
   const ranRef = useRef(false);
+
+  if (pathname.startsWith("/admin/articles/")) {
+    return <Outlet />;
+  }
 
   useEffect(() => {
     let cancelled = false;
