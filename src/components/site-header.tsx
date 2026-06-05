@@ -121,7 +121,7 @@ export function SiteHeader() {
         {/* Mobile drawer — always white for readability */}
         {open && (
           <nav
-            className="rounded-b-2xl border-t border-slate-200 bg-white text-slate-900 lg:hidden animate-in slide-in-from-top-2 duration-200"
+            className="rounded-b-2xl border-t border-slate-200 bg-white text-slate-900 shadow-xl lg:hidden animate-in slide-in-from-top-2 duration-200 dark:border-slate-200 dark:bg-white dark:text-slate-900"
             aria-label="Mobile"
           >
             <div className="flex flex-col px-3 py-3">
@@ -132,7 +132,7 @@ export function SiteHeader() {
                   onClick={() => setOpen(false)}
                   activeOptions={{ exact: item.to === "/" }}
                   activeProps={{ className: "bg-brand/10 text-brand" }}
-                  className="rounded-lg px-4 py-3 text-base font-semibold text-slate-800 hover:bg-slate-100"
+                  className="rounded-lg px-4 py-3 text-base font-semibold text-slate-800 hover:bg-slate-100 dark:text-slate-800 dark:hover:bg-slate-100"
                 >
                   {item.label}
                 </Link>

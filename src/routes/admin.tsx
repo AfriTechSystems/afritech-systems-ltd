@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,6 +57,8 @@ async function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise
 
 function AdminPage() {
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isArticleEditorRoute = pathname.startsWith("/admin/articles/");
   const qc = useQueryClient();
   const [tab, setTab] = useState<"leads" | "articles">("leads");
   const [access, setAccess] = useState<AccessState>({ kind: "loading" });
@@ -132,7 +134,7 @@ function AdminPage() {
 
   const leadsQ = useQuery({
     queryKey: ["admin", "leads"],
-    enabled: isAuthorized,
+    enabled: isAuthorized && !isArticleEditorRoute,
     queryFn: async (): Promise<Lead[]> => {
       const { data, error } = await supabase
         .from("leads")
@@ -145,7 +147,7 @@ function AdminPage() {
 
   const articlesQ = useQuery({
     queryKey: ["admin", "articles"],
-    enabled: isAuthorized,
+    enabled: isAuthorized && !isArticleEditorRoute,
     queryFn: async (): Promise<ArticleRow[]> => {
       const { data, error } = await supabase
         .from("articles")
@@ -207,6 +209,10 @@ function AdminPage() {
     a.download = `afritech-leads-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  if (isArticleEditorRoute && isAuthorized) {
+    return <Outlet />;
   }
 
   if (access.kind === "loading") {

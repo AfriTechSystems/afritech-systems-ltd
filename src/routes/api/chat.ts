@@ -1,4 +1,4 @@
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createOpenAI } from "@ai-sdk/openai";
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 
@@ -37,31 +37,33 @@ export const Route = createFileRoute("/api/chat")({
             );
           }
 
-          const key = process.env.LOVABLE_API_KEY;
+          const key = process.env.OPENAI_API_KEY;
           if (!key) {
-            console.error("[chat] Missing LOVABLE_API_KEY on this deployment");
+            console.error("[chat] Missing OPENAI_API_KEY on this deployment");
             return new Response(
               JSON.stringify({
                 error:
-                  "AI assistant is not configured on this deployment. Please add the LOVABLE_API_KEY environment variable in Vercel and redeploy.",
+                  "AI assistant is not configured on this deployment. Please add the OPENAI_API_KEY environment variable in Vercel and redeploy.",
               }),
               { status: 503, headers: { "Content-Type": "application/json" } },
             );
           }
 
-          const gateway = createLovableAiGatewayProvider(key);
-          const model = gateway("google/gemini-2.5-flash");
+          const openai = createOpenAI({ apiKey: key });
+          const model = openai("gpt-4o-mini");
+          const uiMessages = messages as UIMessage[];
 
           const result = streamText({
             model,
             system: SYSTEM_PROMPT,
-            messages: await convertToModelMessages(messages as UIMessage[]),
+            messages: await convertToModelMessages(uiMessages),
             onError: (err) => {
               console.error("[chat] streamText error", err);
             },
           });
 
           return result.toUIMessageStreamResponse({
+            originalMessages: uiMessages,
             onError: (err) => {
               console.error("[chat] stream response error", err);
               const msg = err instanceof Error ? err.message : String(err);

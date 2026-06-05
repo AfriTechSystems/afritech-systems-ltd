@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 /**
  * Auto-grants the `admin` role to any signed-in user whose email is
@@ -11,6 +10,18 @@ export const ensureAdminAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: currentRoles, error: currentRolesErr } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+
+    if (currentRolesErr) console.error("[ensureAdminAccess] initial roles check failed", currentRolesErr);
+    const alreadyAdmin = (currentRoles ?? []).some((r) => r.role === "admin" || r.role === "editor");
+    if (alreadyAdmin) {
+      return { isAdmin: true, email: null as string | null, allowlisted: false };
+    }
 
     const { data: userRes, error: userErr } = await supabaseAdmin.auth.admin.getUserById(userId);
     if (userErr || !userRes.user) {
