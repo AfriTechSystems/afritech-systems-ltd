@@ -19,6 +19,13 @@ import { Route as ArticlesRouteImport } from './routes/articles'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SolutionsSchoolManagementRouteImport } from './routes/solutions.school-management'
+import { Route as SolutionsEnterpriseErpRouteImport } from './routes/solutions.enterprise-erp'
+import { Route as SolutionsAutomationDashboardsRouteImport } from './routes/solutions.automation-dashboards'
+import { Route as IndustriesManufacturingRouteImport } from './routes/industries.manufacturing'
+import { Route as IndustriesLogisticsRouteImport } from './routes/industries.logistics'
+import { Route as IndustriesHealthcareRouteImport } from './routes/industries.healthcare'
+import { Route as IndustriesEducationRouteImport } from './routes/industries.education'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiAuditLeadRouteImport } from './routes/api/audit-lead'
@@ -74,6 +81,43 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SolutionsSchoolManagementRoute =
+  SolutionsSchoolManagementRouteImport.update({
+    id: '/school-management',
+    path: '/school-management',
+    getParentRoute: () => SolutionsRoute,
+  } as any)
+const SolutionsEnterpriseErpRoute = SolutionsEnterpriseErpRouteImport.update({
+  id: '/enterprise-erp',
+  path: '/enterprise-erp',
+  getParentRoute: () => SolutionsRoute,
+} as any)
+const SolutionsAutomationDashboardsRoute =
+  SolutionsAutomationDashboardsRouteImport.update({
+    id: '/automation-dashboards',
+    path: '/automation-dashboards',
+    getParentRoute: () => SolutionsRoute,
+  } as any)
+const IndustriesManufacturingRoute = IndustriesManufacturingRouteImport.update({
+  id: '/manufacturing',
+  path: '/manufacturing',
+  getParentRoute: () => IndustriesRoute,
+} as any)
+const IndustriesLogisticsRoute = IndustriesLogisticsRouteImport.update({
+  id: '/logistics',
+  path: '/logistics',
+  getParentRoute: () => IndustriesRoute,
+} as any)
+const IndustriesHealthcareRoute = IndustriesHealthcareRouteImport.update({
+  id: '/healthcare',
+  path: '/healthcare',
+  getParentRoute: () => IndustriesRoute,
+} as any)
+const IndustriesEducationRoute = IndustriesEducationRouteImport.update({
+  id: '/education',
+  path: '/education',
+  getParentRoute: () => IndustriesRoute,
+} as any)
 const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -101,14 +145,21 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/articles': typeof ArticlesRouteWithChildren
   '/contact': typeof ContactRoute
-  '/industries': typeof IndustriesRoute
+  '/industries': typeof IndustriesRouteWithChildren
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/solutions': typeof SolutionsRoute
+  '/solutions': typeof SolutionsRouteWithChildren
   '/api/audit-lead': typeof ApiAuditLeadRoute
   '/api/chat': typeof ApiChatRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/industries/education': typeof IndustriesEducationRoute
+  '/industries/healthcare': typeof IndustriesHealthcareRoute
+  '/industries/logistics': typeof IndustriesLogisticsRoute
+  '/industries/manufacturing': typeof IndustriesManufacturingRoute
+  '/solutions/automation-dashboards': typeof SolutionsAutomationDashboardsRoute
+  '/solutions/enterprise-erp': typeof SolutionsEnterpriseErpRoute
+  '/solutions/school-management': typeof SolutionsSchoolManagementRoute
   '/admin/articles/$id': typeof AdminArticlesIdRoute
 }
 export interface FileRoutesByTo {
@@ -117,14 +168,21 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/articles': typeof ArticlesRouteWithChildren
   '/contact': typeof ContactRoute
-  '/industries': typeof IndustriesRoute
+  '/industries': typeof IndustriesRouteWithChildren
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/solutions': typeof SolutionsRoute
+  '/solutions': typeof SolutionsRouteWithChildren
   '/api/audit-lead': typeof ApiAuditLeadRoute
   '/api/chat': typeof ApiChatRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/industries/education': typeof IndustriesEducationRoute
+  '/industries/healthcare': typeof IndustriesHealthcareRoute
+  '/industries/logistics': typeof IndustriesLogisticsRoute
+  '/industries/manufacturing': typeof IndustriesManufacturingRoute
+  '/solutions/automation-dashboards': typeof SolutionsAutomationDashboardsRoute
+  '/solutions/enterprise-erp': typeof SolutionsEnterpriseErpRoute
+  '/solutions/school-management': typeof SolutionsSchoolManagementRoute
   '/admin/articles/$id': typeof AdminArticlesIdRoute
 }
 export interface FileRoutesById {
@@ -134,14 +192,21 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/articles': typeof ArticlesRouteWithChildren
   '/contact': typeof ContactRoute
-  '/industries': typeof IndustriesRoute
+  '/industries': typeof IndustriesRouteWithChildren
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/solutions': typeof SolutionsRoute
+  '/solutions': typeof SolutionsRouteWithChildren
   '/api/audit-lead': typeof ApiAuditLeadRoute
   '/api/chat': typeof ApiChatRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/industries/education': typeof IndustriesEducationRoute
+  '/industries/healthcare': typeof IndustriesHealthcareRoute
+  '/industries/logistics': typeof IndustriesLogisticsRoute
+  '/industries/manufacturing': typeof IndustriesManufacturingRoute
+  '/solutions/automation-dashboards': typeof SolutionsAutomationDashboardsRoute
+  '/solutions/enterprise-erp': typeof SolutionsEnterpriseErpRoute
+  '/solutions/school-management': typeof SolutionsSchoolManagementRoute
   '/admin/articles/$id': typeof AdminArticlesIdRoute
 }
 export interface FileRouteTypes {
@@ -160,6 +225,13 @@ export interface FileRouteTypes {
     | '/api/audit-lead'
     | '/api/chat'
     | '/articles/$slug'
+    | '/industries/education'
+    | '/industries/healthcare'
+    | '/industries/logistics'
+    | '/industries/manufacturing'
+    | '/solutions/automation-dashboards'
+    | '/solutions/enterprise-erp'
+    | '/solutions/school-management'
     | '/admin/articles/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -176,6 +248,13 @@ export interface FileRouteTypes {
     | '/api/audit-lead'
     | '/api/chat'
     | '/articles/$slug'
+    | '/industries/education'
+    | '/industries/healthcare'
+    | '/industries/logistics'
+    | '/industries/manufacturing'
+    | '/solutions/automation-dashboards'
+    | '/solutions/enterprise-erp'
+    | '/solutions/school-management'
     | '/admin/articles/$id'
   id:
     | '__root__'
@@ -192,6 +271,13 @@ export interface FileRouteTypes {
     | '/api/audit-lead'
     | '/api/chat'
     | '/articles/$slug'
+    | '/industries/education'
+    | '/industries/healthcare'
+    | '/industries/logistics'
+    | '/industries/manufacturing'
+    | '/solutions/automation-dashboards'
+    | '/solutions/enterprise-erp'
+    | '/solutions/school-management'
     | '/admin/articles/$id'
   fileRoutesById: FileRoutesById
 }
@@ -201,11 +287,11 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   ArticlesRoute: typeof ArticlesRouteWithChildren
   ContactRoute: typeof ContactRoute
-  IndustriesRoute: typeof IndustriesRoute
+  IndustriesRoute: typeof IndustriesRouteWithChildren
   IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  SolutionsRoute: typeof SolutionsRoute
+  SolutionsRoute: typeof SolutionsRouteWithChildren
   ApiAuditLeadRoute: typeof ApiAuditLeadRoute
   ApiChatRoute: typeof ApiChatRoute
 }
@@ -282,6 +368,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/solutions/school-management': {
+      id: '/solutions/school-management'
+      path: '/school-management'
+      fullPath: '/solutions/school-management'
+      preLoaderRoute: typeof SolutionsSchoolManagementRouteImport
+      parentRoute: typeof SolutionsRoute
+    }
+    '/solutions/enterprise-erp': {
+      id: '/solutions/enterprise-erp'
+      path: '/enterprise-erp'
+      fullPath: '/solutions/enterprise-erp'
+      preLoaderRoute: typeof SolutionsEnterpriseErpRouteImport
+      parentRoute: typeof SolutionsRoute
+    }
+    '/solutions/automation-dashboards': {
+      id: '/solutions/automation-dashboards'
+      path: '/automation-dashboards'
+      fullPath: '/solutions/automation-dashboards'
+      preLoaderRoute: typeof SolutionsAutomationDashboardsRouteImport
+      parentRoute: typeof SolutionsRoute
+    }
+    '/industries/manufacturing': {
+      id: '/industries/manufacturing'
+      path: '/manufacturing'
+      fullPath: '/industries/manufacturing'
+      preLoaderRoute: typeof IndustriesManufacturingRouteImport
+      parentRoute: typeof IndustriesRoute
+    }
+    '/industries/logistics': {
+      id: '/industries/logistics'
+      path: '/logistics'
+      fullPath: '/industries/logistics'
+      preLoaderRoute: typeof IndustriesLogisticsRouteImport
+      parentRoute: typeof IndustriesRoute
+    }
+    '/industries/healthcare': {
+      id: '/industries/healthcare'
+      path: '/healthcare'
+      fullPath: '/industries/healthcare'
+      preLoaderRoute: typeof IndustriesHealthcareRouteImport
+      parentRoute: typeof IndustriesRoute
+    }
+    '/industries/education': {
+      id: '/industries/education'
+      path: '/education'
+      fullPath: '/industries/education'
+      preLoaderRoute: typeof IndustriesEducationRouteImport
+      parentRoute: typeof IndustriesRoute
+    }
     '/articles/$slug': {
       id: '/articles/$slug'
       path: '/$slug'
@@ -335,17 +470,51 @@ const ArticlesRouteWithChildren = ArticlesRoute._addFileChildren(
   ArticlesRouteChildren,
 )
 
+interface IndustriesRouteChildren {
+  IndustriesEducationRoute: typeof IndustriesEducationRoute
+  IndustriesHealthcareRoute: typeof IndustriesHealthcareRoute
+  IndustriesLogisticsRoute: typeof IndustriesLogisticsRoute
+  IndustriesManufacturingRoute: typeof IndustriesManufacturingRoute
+}
+
+const IndustriesRouteChildren: IndustriesRouteChildren = {
+  IndustriesEducationRoute: IndustriesEducationRoute,
+  IndustriesHealthcareRoute: IndustriesHealthcareRoute,
+  IndustriesLogisticsRoute: IndustriesLogisticsRoute,
+  IndustriesManufacturingRoute: IndustriesManufacturingRoute,
+}
+
+const IndustriesRouteWithChildren = IndustriesRoute._addFileChildren(
+  IndustriesRouteChildren,
+)
+
+interface SolutionsRouteChildren {
+  SolutionsAutomationDashboardsRoute: typeof SolutionsAutomationDashboardsRoute
+  SolutionsEnterpriseErpRoute: typeof SolutionsEnterpriseErpRoute
+  SolutionsSchoolManagementRoute: typeof SolutionsSchoolManagementRoute
+}
+
+const SolutionsRouteChildren: SolutionsRouteChildren = {
+  SolutionsAutomationDashboardsRoute: SolutionsAutomationDashboardsRoute,
+  SolutionsEnterpriseErpRoute: SolutionsEnterpriseErpRoute,
+  SolutionsSchoolManagementRoute: SolutionsSchoolManagementRoute,
+}
+
+const SolutionsRouteWithChildren = SolutionsRoute._addFileChildren(
+  SolutionsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   ArticlesRoute: ArticlesRouteWithChildren,
   ContactRoute: ContactRoute,
-  IndustriesRoute: IndustriesRoute,
+  IndustriesRoute: IndustriesRouteWithChildren,
   IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  SolutionsRoute: SolutionsRoute,
+  SolutionsRoute: SolutionsRouteWithChildren,
   ApiAuditLeadRoute: ApiAuditLeadRoute,
   ApiChatRoute: ApiChatRoute,
 }
