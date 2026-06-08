@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import logoLight from "@/assets/afritech-logo-full.png";
-import logoDark from "@/assets/afritech-logo-dark.png";
 import { NAV_GROUPS, SIMPLE_NAV, SITE } from "@/lib/site";
 import { ThemeToggle } from "./theme-toggle";
 import { BookCallButton } from "./book-call-button";
