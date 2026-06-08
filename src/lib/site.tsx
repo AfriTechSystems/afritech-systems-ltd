@@ -38,19 +38,19 @@ export const NAV_GROUPS = [
     label: "Solutions",
     to: "/solutions",
     items: [
-      { to: "/solutions", label: "Custom ERP", desc: "Replace spreadsheets with one connected system.", icon: Boxes },
-      { to: "/solutions", label: "School Management", desc: "Grades, attendance, fees and parent portal.", icon: GraduationCap },
-      { to: "/solutions", label: "Automation & Dashboards", desc: "Live KPIs and automated workflows.", icon: BarChart3 },
+      { to: "/solutions/enterprise-erp", label: "Custom Enterprise ERP", desc: "One auditable system for finance, HR, ops.", icon: Boxes },
+      { to: "/solutions/school-management", label: "School ERP Systems", desc: "Admissions, fees, grading, parent portal.", icon: GraduationCap },
+      { to: "/solutions/automation-dashboards", label: "Automation & Dashboards", desc: "Live KPIs and automated workflows.", icon: BarChart3 },
     ],
   },
   {
     label: "Industries",
     to: "/industries",
     items: [
-      { to: "/industries", label: "Healthcare & Pharma", desc: "Stock, dispensing, compliance.", icon: Boxes },
-      { to: "/industries", label: "Education", desc: "Schools, colleges, universities.", icon: GraduationCap },
-      { to: "/industries", label: "Manufacturing", desc: "Production, quality, inventory.", icon: Factory },
-      { to: "/industries", label: "Logistics", desc: "Fleet, routing, dispatch.", icon: Truck },
+      { to: "/industries/healthcare", label: "Healthcare & Pharma", desc: "Stock, dispensing, compliance.", icon: Boxes },
+      { to: "/industries/education", label: "Education", desc: "Schools, colleges, universities.", icon: GraduationCap },
+      { to: "/industries/manufacturing", label: "Manufacturing", desc: "Production, quality, inventory.", icon: Factory },
+      { to: "/industries/logistics", label: "Logistics", desc: "Fleet, routing, dispatch.", icon: Truck },
     ],
   },
   {

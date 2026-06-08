@@ -1,40 +1,52 @@
-## Plan: Vercel-compatible fix
+## Plan
 
-### 1. Fix admin access and article publishing
-- Your email `hamwendamwando@gmail.com` already exists, is confirmed, and already has the `admin` role.
-- The real blocker is database API permissions: the `articles`, `leads`, and `user_roles` tables currently have no explicit app-access grants, so Vercel/browser reads and writes can fail even though the role policies exist.
-- Add a database migration that grants the correct access:
-  - `articles`: public can read published articles; signed-in admins/editors can create, edit, publish, and delete.
-  - `leads`: visitors can submit leads; signed-in admins can view, export, edit, and delete.
-  - `user_roles`: signed-in users can read their own role; admins can manage roles.
-  - service access remains available for trusted backend checks.
-- Update the article editor to show clearer save/publish/upload errors instead of silently failing.
+### 1. SEO hierarchy — create real child routes
+Build dedicated route files (each with its own H1, short meta title <25 chars, unique description, og:url, canonical, and BreadcrumbList JSON-LD):
 
-### 2. Make admin checks reliable on Vercel
-- Adjust the admin access server function so server-only backend imports happen inside the handler, which is safer for Vercel/TanStack bundling.
-- Keep the current allow-list fallback, but make the UI explain exactly whether the issue is sign-in, missing admin role, or a backend/env configuration problem.
+- `src/routes/solutions.enterprise-erp.tsx` — H1 "Custom Enterprise ERP"
+- `src/routes/solutions.school-management.tsx` — H1 "School ERP Systems"
+- `src/routes/solutions.automation-dashboards.tsx` — H1 "Automation & Dashboards"
+- `src/routes/industries.healthcare.tsx` — H1 "Healthcare & Pharma"
+- `src/routes/industries.education.tsx` — H1 "Education"
+- `src/routes/industries.manufacturing.tsx` — H1 "Manufacturing"
+- `src/routes/industries.logistics.tsx` — H1 "Logistics"
 
-### 3. Fix all images for Vercel hosting
-- Replace Lovable-only asset JSON URLs like `/__l5e/assets-v1/...` with real static image files committed into the app/public build output.
-- Download or recreate the current hero, case study, integration logo, and social preview images into repo-managed image files.
-- Update imports in:
-  - homepage hero
-  - case studies
-  - integrations list/page
-  - root social preview image if needed
-- Preserve existing alt text and responsive sizing.
+Each page reuses existing copy/components and adds an "Internal Anchor Loop" linking back to `/contact`, sibling solutions, and `/articles`.
 
-### 4. Keep popup navigation white in all modes
-- Ensure desktop dropdowns and mobile drawer use a white background with dark readable text in both light and dark mode.
-- Remove any inherited dark-mode styling that can make the popup/nav panel dark.
+### 2. Update navigation + sitemap
+- `src/lib/site.tsx` — point every `NAV_GROUPS.items[].to` at the new child routes (not the generic landing).
+- `src/components/site-header.tsx` — make dropdown labels short (<25 chars), and link the group label itself ("Solutions", "Industries") to the parent page.
+- `src/routes/sitemap[.]xml.ts` — add the 7 new URLs.
+- Home page (`hero.tsx` / `solutions-suite.tsx` / `industry-matrix.tsx`) — turn flat-text service mentions into contextual `<Link>`s pointing to the new child routes (the "internal anchor loop").
 
-### 5. Fix Vercel chatbot setup
-- Rotate the managed AI key so Lovable shows a fresh `LOVABLE_API_KEY` value once.
-- You will copy that new value into Vercel Environment Variables as `LOVABLE_API_KEY`, then redeploy.
-- Keep the current user-facing chat error message so if Vercel is missing the key again, it shows a clear configuration message instead of blank replies.
+### 3. Enrich Organization JSON-LD in `__root.tsx`
+Add `legalName`, `logo` (absolute URL), `slogan: "Systems Reimagined"`, and `sameAs: ["https://www.linkedin.com/company/afritechsystemsltd/"]` to the existing Organization schema. Keep the existing address block.
 
-### 6. Validate after implementation
-- Verify the admin role grants are present.
-- Verify article create/publish works from the app permissions side.
-- Verify updated image paths are no longer `/__l5e/...`, so they can load on Vercel.
-- Publish/update the Lovable preview changes, then you can redeploy Vercel with the new environment variable.
+### 4. Header bar white in BOTH light and dark mode
+`src/components/site-header.tsx`: replace the dark navy header background with white (`bg-white text-slate-900`) for both themes; swap to the dark/full-color logo variant on white; adjust hover states, mobile-menu button border, and active-link colors to remain legible on white. Keep dropdown + mobile drawer white (already).
+
+### 5. Fix storage upload "permission denied for function has_role"
+The storage role lacks EXECUTE on `public.has_role`. New migration:
+
+```sql
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated, anon, service_role;
+```
+
+This lets the storage RLS policy on `article-images` invoke `has_role` so admin/editor uploads succeed.
+
+### 6. Admin portal access on the published custom domain
+The dashboard already lists leads (form submissions) and articles — that part works once auth resolves. The published-site lockout is almost certainly because `ADMIN_EMAILS` (and `OPENAI_API_KEY`) aren't set in Vercel env vars, so `ensureAdminAccess` returns "denied". Actions:
+
+- Verify `src/start.ts` registers `attachSupabaseAuth` in `functionMiddleware` (needed for the serverFn auth header). Add it if missing.
+- Add a clearer "denied" message showing the allow-list count (already logged) so we can diagnose from the published site.
+- Direct DB grant of `admin` role to `hamwendamwando@gmail.com` already in place — confirm row exists.
+- **Action required from you**: in Vercel → Environment Variables, set `ADMIN_EMAILS=hamwendamwando@gmail.com` (plus any other admins), `OPENAI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, then redeploy. Without these the published serverFn can't grant or check admin roles.
+
+### 7. Form submissions visible in admin
+Already wired (`leadsQ` in `src/routes/admin.tsx` reads from `public.leads` with admin RLS). It will become visible automatically once #6 succeeds. No code change needed beyond confirming the query is intact.
+
+### Technical notes
+- Each new route uses `createFileRoute("/solutions/enterprise-erp")` etc., with `head()` providing `title`, `description`, `og:title`, `og:description`, `og:url`, canonical link, and a `BreadcrumbList` JSON-LD script (Home → Solutions → Enterprise ERP).
+- Header color change is purely Tailwind class swaps in `site-header.tsx`; no token changes.
+- Storage permission migration is a single `GRANT EXECUTE` — no policy rewrite.
+- No edits to auto-generated files (`routeTree.gen.ts`, supabase `client.ts`, etc.).
