@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { X, Send, Loader2, Calendar, Briefcase, Mail, FileText, Layers } from "lucide-react";
-import alfredBot from "@/assets/alfred-bot.png";
+const alfredBot = "/img/alfred-bot.webp";
 import { BookCallButton } from "@/components/book-call-button";
 
 const chatTransport = new DefaultChatTransport({ api: "/api/chat" });
