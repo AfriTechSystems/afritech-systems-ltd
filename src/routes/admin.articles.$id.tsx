@@ -87,6 +87,10 @@ function ArticleEditor() {
           setOgImage((row as { og_image?: string }).og_image ?? "");
           setTagsInput((row.tags ?? []).join(", "));
           setPublished(!!row.published);
+          setAuthorName((row as { author_name?: string }).author_name ?? "");
+          setAuthorTitle((row as { author_title?: string }).author_title ?? "");
+          setAuthorBio((row as { author_bio?: string }).author_bio ?? "");
+          setAuthorAvatarUrl((row as { author_avatar_url?: string }).author_avatar_url ?? "");
         }
         setLoading(false);
       }
