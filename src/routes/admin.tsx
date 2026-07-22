@@ -310,7 +310,11 @@ function AdminPage() {
                         <th className="px-4 py-3">Name</th>
                         <th className="px-4 py-3">Company</th>
                         <th className="px-4 py-3">Email</th>
-                        <th className="px-4 py-3">Wants</th>
+                        <th className="px-4 py-3">Engine</th>
+                        <th className="px-4 py-3">Metric</th>
+                        <th className="px-4 py-3">Blocker</th>
+                        <th className="px-4 py-3">Needs</th>
+                        <th className="px-4 py-3">Source</th>
                         <th className="px-4 py-3"></th>
                       </tr>
                     </thead>
@@ -325,15 +329,18 @@ function AdminPage() {
                           <td className="px-4 py-3">
                             <a href={`mailto:${l.email}`} className="text-brand hover:underline">{l.email}</a>
                           </td>
-                          <td className="px-4 py-3 text-xs">
-                            <div><strong>Need:</strong> {l.help}</div>
-                            {l.bottleneck && <div><strong>Blocker:</strong> {l.bottleneck}</div>}
-                            {l.message && <div className="mt-1 max-w-md text-muted-foreground">{l.message}</div>}
-                          </td>
+                          <td className="px-4 py-3 text-xs">{l.engine || "—"}</td>
+                          <td className="px-4 py-3 text-xs">{l.metric || "—"}</td>
+                          <td className="px-4 py-3 text-xs">{l.bottleneck || "—"}</td>
+                          <td className="px-4 py-3 text-xs">{l.help || "—"}</td>
+                          <td className="px-4 py-3 text-xs text-muted-foreground">{l.source || "—"}</td>
                           <td className="px-4 py-3 text-right">
-                            <button onClick={() => deleteLead(l)} className="text-muted-foreground hover:text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                            </button>
+                            <div className="inline-flex gap-2">
+                              <button onClick={() => setSelectedLead(l)} className="rounded-full border border-border px-3 py-1 text-xs hover:bg-accent">View</button>
+                              <button onClick={() => deleteLead(l)} className="text-muted-foreground hover:text-destructive">
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
