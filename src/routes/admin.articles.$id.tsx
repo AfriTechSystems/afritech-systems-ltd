@@ -172,6 +172,10 @@ function ArticleEditor() {
         published: willPublish,
         published_at: willPublish ? new Date().toISOString() : null,
         author_id: userId,
+        author_name: authorName.trim() || null,
+        author_title: authorTitle.trim() || null,
+        author_bio: authorBio.trim() || null,
+        author_avatar_url: authorAvatarUrl.trim() || null,
       };
       if (isNew) {
         const { data, error } = await supabase.from("articles").insert(payload).select("id").single();
