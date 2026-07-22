@@ -61,6 +61,7 @@ function AdminPage() {
   const isArticleEditorRoute = pathname.startsWith("/admin/articles/");
   const qc = useQueryClient();
   const [tab, setTab] = useState<"leads" | "articles">("leads");
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [access, setAccess] = useState<AccessState>({ kind: "loading" });
   const ranRef = useRef(false);
 
