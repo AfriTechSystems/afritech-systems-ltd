@@ -1,52 +1,56 @@
-## Plan
 
-### 1. SEO hierarchy — create real child routes
-Build dedicated route files (each with its own H1, short meta title <25 chars, unique description, og:url, canonical, and BreadcrumbList JSON-LD):
+## 1. Articles — "Read more" opens a full article
 
-- `src/routes/solutions.enterprise-erp.tsx` — H1 "Custom Enterprise ERP"
-- `src/routes/solutions.school-management.tsx` — H1 "School ERP Systems"
-- `src/routes/solutions.automation-dashboards.tsx` — H1 "Automation & Dashboards"
-- `src/routes/industries.healthcare.tsx` — H1 "Healthcare & Pharma"
-- `src/routes/industries.education.tsx` — H1 "Education"
-- `src/routes/industries.manufacturing.tsx` — H1 "Manufacturing"
-- `src/routes/industries.logistics.tsx` — H1 "Logistics"
+Investigate why the article page appears truncated after clicking Read more on the live site, then apply the matching fix. Likely causes and fixes:
 
-Each page reuses existing copy/components and adds an "Internal Anchor Loop" linking back to `/contact`, sibling solutions, and `/articles`.
+- SPA reload: hard-nav to `/articles/:slug` on Vercel may hit the SPA fallback correctly, but the loader's Supabase call runs isomorphically. Move the query into `createServerFn` (public read via the server publishable client) and keep `ensureQueryData` in the loader so the article HTML is present on first paint. Fall back to the browser client only on client transitions.
+- Content truncation: article page currently reads `body_md` correctly and pipes to ReactMarkdown, so if the body is short it looks "cut". Add clearer empty-body handling and make the prose container remove the `line-clamp`/`max-h` inherited from Tailwind Typography edge cases (audit classes on the wrapper).
+- Verify by opening a published article on the deployed site with Playwright and comparing rendered content length against `body_md` length.
 
-### 2. Update navigation + sitemap
-- `src/lib/site.tsx` — point every `NAV_GROUPS.items[].to` at the new child routes (not the generic landing).
-- `src/components/site-header.tsx` — make dropdown labels short (<25 chars), and link the group label itself ("Solutions", "Industries") to the parent page.
-- `src/routes/sitemap[.]xml.ts` — add the 7 new URLs.
-- Home page (`hero.tsx` / `solutions-suite.tsx` / `industry-matrix.tsx`) — turn flat-text service mentions into contextual `<Link>`s pointing to the new child routes (the "internal anchor loop").
+## 2. Article authoring — Author field + short bio
 
-### 3. Enrich Organization JSON-LD in `__root.tsx`
-Add `legalName`, `logo` (absolute URL), `slogan: "Systems Reimagined"`, and `sameAs: ["https://www.linkedin.com/company/afritechsystemsltd/"]` to the existing Organization schema. Keep the existing address block.
+Schema (migration):
+- `articles.author_name text`
+- `articles.author_title text` (optional role, e.g. "Systems Engineer")
+- `articles.author_bio text` (short paragraph, ≤ 400 chars)
+- `articles.author_avatar_url text` (optional)
 
-### 4. Header bar white in BOTH light and dark mode
-`src/components/site-header.tsx`: replace the dark navy header background with white (`bg-white text-slate-900`) for both themes; swap to the dark/full-color logo variant on white; adjust hover states, mobile-menu button border, and active-link colors to remain legible on white. Keep dropdown + mobile drawer white (already).
+UI:
+- `admin.articles.$id.tsx`: add "Author" section (name, title, bio textarea with counter, optional avatar via existing storage uploader).
+- `articles.$slug.tsx`: render an "About the author" card at the end of the article with name/title/bio/avatar, plus a byline under the H1 replacing the generic "By AfriTech Systems editorial team".
+- Include author in JSON-LD (`Article.author.@type = Person` when present).
 
-### 5. Fix storage upload "permission denied for function has_role"
-The storage role lacks EXECUTE on `public.has_role`. New migration:
+## 3. Admin dashboard — full contact submission details
 
-```sql
-GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated, anon, service_role;
-```
+`src/routes/admin.tsx` currently shows Name/Company/Email/Need/Blocker/Message. Expand to show every field the audit/contact form captures:
 
-This lets the storage RLS policy on `article-images` invoke `has_role` so admin/editor uploads succeed.
+- Add columns / expandable row for: engine, metric, source, created_at (already there).
+- Add a "View" action that opens a side panel or modal with the full record (all lead columns pretty-printed) and a "Copy email" button.
+- Extend CSV export to include every column (already close — just confirm headers list matches the table).
+- No schema change (leads table already has these fields).
 
-### 6. Admin portal access on the published custom domain
-The dashboard already lists leads (form submissions) and articles — that part works once auth resolves. The published-site lockout is almost certainly because `ADMIN_EMAILS` (and `OPENAI_API_KEY`) aren't set in Vercel env vars, so `ensureAdminAccess` returns "denied". Actions:
+## 4. Performance / Lighthouse fixes (the biggest wins from the report)
 
-- Verify `src/start.ts` registers `attachSupabaseAuth` in `functionMiddleware` (needed for the serverFn auth header). Add it if missing.
-- Add a clearer "denied" message showing the allow-list count (already logged) so we can diagnose from the published site.
-- Direct DB grant of `admin` role to `hamwendamwando@gmail.com` already in place — confirm row exists.
-- **Action required from you**: in Vercel → Environment Variables, set `ADMIN_EMAILS=hamwendamwando@gmail.com` (plus any other admins), `OPENAI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, then redeploy. Without these the published serverFn can't grant or check admin roles.
+Files:
 
-### 7. Form submissions visible in admin
-Already wired (`leadsQ` in `src/routes/admin.tsx` reads from `public.leads` with admin RLS). It will become visible automatically once #6 succeeds. No code change needed beyond confirming the query is intact.
+- `src/components/site-header.tsx`: add explicit `width`/`height` on the logo `<img>` (fixes CLS + "images missing width/height"). Resize/replace `afritech-logo-full` with a properly compressed webp (~40 KB) at ~400×400 intrinsic and keep responsive classes.
+- `src/components/ai-chat.tsx` (Alfred bot image): replace the 480×520 png with a compressed webp sized ~200×220 and add explicit `width`/`height`. Lighthouse flagged 215 KiB potential savings here.
+- `src/components/home/hero.tsx`: keep `fetchpriority="high"` and add a `<link rel="preload" as="image" href="/img/hero/hero-collaboration.webp" fetchpriority="high">` in that route's `head().links`; convert the hero JPG to webp at 1024×820.
+- `src/routes/__root.tsx`: swap the Google Fonts `<link rel="stylesheet">` for the non-blocking pattern (`rel="preload" as="style" onload="this.rel='stylesheet'"` + `<noscript>` fallback) and add `&display=swap`. Fixes the 750 ms render-blocking Google Fonts request.
+- `vite.config.ts`: add manual chunk split for `react-markdown` + `remark-gfm` so the 289 KB `index-*.js` no longer ships to the home page; article route lazy-loads them.
+- `vercel.json`: add response headers — `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Content-Security-Policy` (report-only first). Addresses Best-Practices warnings.
+- `src/routes/index.tsx`: fix canonical — Lighthouse reported `/` (relative) is invalid; set an absolute `https://afritechsystemsltd.com/` canonical.
+- `src/styles.css` / `src/components/home/three-steps.tsx` etc.: bump `--color-brand` foreground contrast on light surfaces so `text-brand` passes WCAG AA on `bg-background` (Lighthouse flagged 20+ contrast failures) — adjust the token, not each usage.
 
-### Technical notes
-- Each new route uses `createFileRoute("/solutions/enterprise-erp")` etc., with `head()` providing `title`, `description`, `og:title`, `og:description`, `og:url`, canonical link, and a `BreadcrumbList` JSON-LD script (Home → Solutions → Enterprise ERP).
-- Header color change is purely Tailwind class swaps in `site-header.tsx`; no token changes.
-- Storage permission migration is a single `GRANT EXECUTE` — no policy rewrite.
-- No edits to auto-generated files (`routeTree.gen.ts`, supabase `client.ts`, etc.).
+## 5. Verification
+
+- Playwright: open `/articles`, click Read more on a published article, screenshot the full page, and confirm `body_md` renders end-to-end.
+- Create a test article with an author name/bio via `/admin/articles/new`, publish, verify byline + author card on the live article.
+- Submit an audit form entry, open `/admin`, confirm every field appears in the row and in the detail view.
+- Re-run Lighthouse locally (or wait for next scan): expect LCP < 2.5 s, CLS ≈ 0, contrast passing, HSTS/XFO headers present.
+
+## Technical notes
+
+- Only `articles` schema needs migration (author columns). No `leads` schema change.
+- The public article read stays under the existing `Anyone can view published articles` policy; adding a server-side fetcher just avoids leaking a Supabase 401 during Vercel SSR when a cold request hits without a session.
+- All new images stored under `public/img/` or externalised via `lovable-assets` — no CDN change required.

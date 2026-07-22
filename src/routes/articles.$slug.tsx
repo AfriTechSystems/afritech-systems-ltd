@@ -19,12 +19,16 @@ interface ArticleFull {
   og_image: string | null;
   tags: string[];
   published_at: string | null;
+  author_name: string | null;
+  author_title: string | null;
+  author_bio: string | null;
+  author_avatar_url: string | null;
 }
 
 async function fetchArticle(slug: string): Promise<ArticleFull | null> {
   const { data, error } = await supabase
     .from("articles")
-    .select("id, slug, title, excerpt, body_md, cover_url, cover_alt, seo_title, seo_description, og_image, tags, published_at, published")
+    .select("id, slug, title, excerpt, body_md, cover_url, cover_alt, seo_title, seo_description, og_image, tags, published_at, published, author_name, author_title, author_bio, author_avatar_url")
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
@@ -135,7 +139,7 @@ function ArticlePage() {
               <span className="inline-flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" /> {mins} min read
               </span>
-              <span>By AfriTech Systems editorial team</span>
+              <span>By {data.author_name || "AfriTech Systems editorial team"}{data.author_title ? ` · ${data.author_title}` : ""}</span>
             </div>
           </div>
         </header>
@@ -148,10 +152,30 @@ function ArticlePage() {
 
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <div className="prose prose-base max-w-none dark:prose-invert prose-headings:font-display prose-headings:tracking-tight prose-h2:mt-12 prose-h2:text-2xl sm:prose-h2:text-3xl prose-h3:text-xl prose-a:text-brand hover:prose-a:underline prose-img:rounded-2xl prose-img:shadow-lg prose-img:my-8 prose-blockquote:border-l-brand prose-blockquote:text-foreground/80 prose-li:my-1">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.body_md || ""}</ReactMarkdown>
+            {data.body_md?.trim() ? (
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{data.body_md}</ReactMarkdown>
+            ) : (
+              <p className="text-muted-foreground">This article is being prepared. Please check back shortly.</p>
+            )}
           </div>
 
-          <aside className="mt-14 rounded-3xl border border-border bg-card/70 p-6 text-center sm:p-8">
+          {(data.author_name || data.author_bio) && (
+            <aside className="mt-14 rounded-3xl border border-border bg-card/70 p-6 sm:p-8">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-brand">About the author</p>
+              <div className="mt-3 flex items-start gap-4">
+                {data.author_avatar_url && (
+                  <img src={data.author_avatar_url} alt={data.author_name ?? "Author"} className="h-14 w-14 shrink-0 rounded-full border border-border object-cover" />
+                )}
+                <div>
+                  <p className="font-display text-lg font-bold">{data.author_name}</p>
+                  {data.author_title && <p className="text-xs text-muted-foreground">{data.author_title}</p>}
+                  {data.author_bio && <p className="mt-2 text-sm text-muted-foreground">{data.author_bio}</p>}
+                </div>
+              </div>
+            </aside>
+          )}
+
+          <aside className="mt-8 rounded-3xl border border-border bg-card/70 p-6 text-center sm:p-8">
             <h2 className="font-display text-xl font-bold sm:text-2xl">Need a system built for your business?</h2>
             <p className="mt-2 text-sm text-muted-foreground sm:text-base">Talk to our engineering team — free 30-minute discovery call.</p>
             <div className="mt-5 inline-flex">
@@ -170,7 +194,9 @@ function ArticlePage() {
               description: seoDesc,
               image: ogImg,
               datePublished: data.published_at,
-              author: { "@type": "Organization", name: "AfriTech Systems Limited" },
+              author: data.author_name
+                ? { "@type": "Person", name: data.author_name, jobTitle: data.author_title ?? undefined, description: data.author_bio ?? undefined }
+                : { "@type": "Organization", name: "AfriTech Systems Limited" },
               publisher: {
                 "@type": "Organization",
                 name: "AfriTech Systems Limited",

@@ -61,6 +61,7 @@ function AdminPage() {
   const isArticleEditorRoute = pathname.startsWith("/admin/articles/");
   const qc = useQueryClient();
   const [tab, setTab] = useState<"leads" | "articles">("leads");
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [access, setAccess] = useState<AccessState>({ kind: "loading" });
   const ranRef = useRef(false);
 
@@ -197,7 +198,7 @@ function AdminPage() {
   }
 
   function exportLeadsCsv(leads: Lead[]) {
-    const headers = ["created_at", "name", "company", "email", "bottleneck", "help", "engine", "metric", "message", "source"];
+    const headers = ["created_at", "name", "company", "email", "engine", "metric", "bottleneck", "help", "message", "source"];
     const rows = leads.map((l) =>
       headers.map((h) => `"${String((l as unknown as Record<string, unknown>)[h] ?? "").replace(/"/g, '""')}"`).join(","),
     );
@@ -309,7 +310,11 @@ function AdminPage() {
                         <th className="px-4 py-3">Name</th>
                         <th className="px-4 py-3">Company</th>
                         <th className="px-4 py-3">Email</th>
-                        <th className="px-4 py-3">Wants</th>
+                        <th className="px-4 py-3">Engine</th>
+                        <th className="px-4 py-3">Metric</th>
+                        <th className="px-4 py-3">Blocker</th>
+                        <th className="px-4 py-3">Needs</th>
+                        <th className="px-4 py-3">Source</th>
                         <th className="px-4 py-3"></th>
                       </tr>
                     </thead>
@@ -324,15 +329,18 @@ function AdminPage() {
                           <td className="px-4 py-3">
                             <a href={`mailto:${l.email}`} className="text-brand hover:underline">{l.email}</a>
                           </td>
-                          <td className="px-4 py-3 text-xs">
-                            <div><strong>Need:</strong> {l.help}</div>
-                            {l.bottleneck && <div><strong>Blocker:</strong> {l.bottleneck}</div>}
-                            {l.message && <div className="mt-1 max-w-md text-muted-foreground">{l.message}</div>}
-                          </td>
+                          <td className="px-4 py-3 text-xs">{l.engine || "—"}</td>
+                          <td className="px-4 py-3 text-xs">{l.metric || "—"}</td>
+                          <td className="px-4 py-3 text-xs">{l.bottleneck || "—"}</td>
+                          <td className="px-4 py-3 text-xs">{l.help || "—"}</td>
+                          <td className="px-4 py-3 text-xs text-muted-foreground">{l.source || "—"}</td>
                           <td className="px-4 py-3 text-right">
-                            <button onClick={() => deleteLead(l)} className="text-muted-foreground hover:text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                            </button>
+                            <div className="inline-flex gap-2">
+                              <button onClick={() => setSelectedLead(l)} className="rounded-full border border-border px-3 py-1 text-xs hover:bg-accent">View</button>
+                              <button onClick={() => deleteLead(l)} className="text-muted-foreground hover:text-destructive">
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -384,6 +392,58 @@ function AdminPage() {
           )}
         </div>
       </section>
+
+      {selectedLead && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => setSelectedLead(null)}
+        >
+          <div
+            className="max-h-[85vh] w-full max-w-lg overflow-auto rounded-2xl border border-border bg-background p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand">Lead detail</p>
+                <h2 className="mt-1 font-display text-xl font-bold">{selectedLead.name}</h2>
+                <p className="text-sm text-muted-foreground">{selectedLead.company}</p>
+              </div>
+              <button onClick={() => setSelectedLead(null)} className="rounded-md p-1 hover:bg-accent" aria-label="Close">
+                ✕
+              </button>
+            </div>
+            <dl className="mt-5 grid gap-3 text-sm">
+              {[
+                { k: "Submitted", v: new Date(selectedLead.created_at).toLocaleString() },
+                { k: "Email", v: <a href={`mailto:${selectedLead.email}`} className="text-brand hover:underline">{selectedLead.email}</a> },
+                { k: "Operational engine", v: selectedLead.engine || "—" },
+                { k: "Metric to optimize", v: selectedLead.metric || "—" },
+                { k: "Main bottleneck", v: selectedLead.bottleneck || "—" },
+                { k: "How we can help", v: selectedLead.help || "—" },
+                { k: "Source", v: selectedLead.source || "—" },
+                { k: "Message", v: selectedLead.message || "—" },
+              ].map((row) => (
+                <div key={row.k} className="grid gap-1 sm:grid-cols-[160px_1fr] sm:gap-3">
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{row.k}</dt>
+                  <dd className="whitespace-pre-wrap text-foreground">{row.v}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => { navigator.clipboard.writeText(selectedLead.email); toast.success("Email copied"); }}
+                className="rounded-full border border-border px-4 py-2 text-sm hover:bg-accent"
+              >
+                Copy email
+              </button>
+              <a href={`mailto:${selectedLead.email}`} className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-brand-foreground shadow-glow">
+                Reply
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Toaster />
     </>
   );

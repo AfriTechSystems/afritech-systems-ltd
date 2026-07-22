@@ -1,17 +1,19 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
-import logoLight from "@/assets/afritech-logo-full.png";
 import { NAV_GROUPS, SIMPLE_NAV, SITE } from "@/lib/site";
 import { ThemeToggle } from "./theme-toggle";
 import { BookCallButton } from "./book-call-button";
 
 function Logo({ className = "" }: { className?: string }) {
-  // Header is now white in both themes — always use the full-color logo.
+  // Optimized webp logo with explicit intrinsic size to eliminate CLS.
   return (
     <img
-      src={logoLight}
+      src="/img/afritech-logo.webp"
       alt={`${SITE.name} logo`}
+      width={400}
+      height={400}
+      decoding="async"
       className={`block object-contain ${className}`}
     />
   );

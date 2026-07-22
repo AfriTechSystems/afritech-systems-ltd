@@ -21,9 +21,12 @@ export const Route = createFileRoute("/")({
       { name: "keywords", content: "Custom Software Development Africa, Process Automation Solutions Zambia, Enterprise Resource Planning Software, School Management Systems, Digital Transformation Services, Corporate Dashboard Systems, Business Intelligence Integration, Spreadsheet Automation Solutions" },
       { property: "og:title", content: "AfriTech Systems — Systems Reimagined" },
       { property: "og:description", content: "Custom ERP, school management, industrial digitization & corporate dashboards. Own your systems — no monthly SaaS fees." },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: "https://afritechsystemsltd.com/" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [
+      { rel: "canonical", href: "https://afritechsystemsltd.com/" },
+      { rel: "preload", as: "image", href: "/img/hero/hero-collaboration.webp", fetchpriority: "high" } as unknown as { rel: string; href: string },
+    ],
   }),
   component: Home,
 });

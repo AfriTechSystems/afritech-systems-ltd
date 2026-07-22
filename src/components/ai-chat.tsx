@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { X, Send, Loader2, Calendar, Briefcase, Mail, FileText, Layers } from "lucide-react";
-import alfredBot from "@/assets/alfred-bot.png";
+const alfredBot = "/img/alfred-bot.webp";
 import { BookCallButton } from "@/components/book-call-button";
 
 const chatTransport = new DefaultChatTransport({ api: "/api/chat" });
@@ -84,6 +84,10 @@ export function AiChatWidget() {
           <img
             src={alfredBot}
             alt="Alfred AI Assistant"
+            width={240}
+            height={260}
+            loading="lazy"
+            decoding="async"
             className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-[0_8px_20px_rgba(0,0,0,0.35)] transition-transform group-hover:scale-110 animate-float"
           />
           <span className="absolute bottom-1 right-1 h-3 w-3 rounded-full bg-success ring-2 ring-background" />

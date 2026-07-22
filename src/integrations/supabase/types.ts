@@ -16,7 +16,11 @@ export type Database = {
     Tables: {
       articles: {
         Row: {
+          author_avatar_url: string | null
+          author_bio: string | null
           author_id: string | null
+          author_name: string | null
+          author_title: string | null
           body_md: string
           cover_alt: string | null
           cover_url: string | null
@@ -34,7 +38,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          author_avatar_url?: string | null
+          author_bio?: string | null
           author_id?: string | null
+          author_name?: string | null
+          author_title?: string | null
           body_md?: string
           cover_alt?: string | null
           cover_url?: string | null
@@ -52,7 +60,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          author_avatar_url?: string | null
+          author_bio?: string | null
           author_id?: string | null
+          author_name?: string | null
+          author_title?: string | null
           body_md?: string
           cover_alt?: string | null
           cover_url?: string | null
