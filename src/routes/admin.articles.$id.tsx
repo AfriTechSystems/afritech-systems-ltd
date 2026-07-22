@@ -41,12 +41,17 @@ function ArticleEditor() {
   const [ogImage, setOgImage] = useState("");
   const [tagsInput, setTagsInput] = useState("");
   const [published, setPublished] = useState(false);
+  const [authorName, setAuthorName] = useState("");
+  const [authorTitle, setAuthorTitle] = useState("");
+  const [authorBio, setAuthorBio] = useState("");
+  const [authorAvatarUrl, setAuthorAvatarUrl] = useState("");
   const [tab, setTab] = useState<"write" | "preview">("write");
   const [uploading, setUploading] = useState(false);
 
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const inlineInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     (async () => {
