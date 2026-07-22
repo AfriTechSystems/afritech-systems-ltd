@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { BookCallButton } from "@/components/book-call-button";
-const heroImageAsset = { url: "/img/hero/hero-collaboration.jpg" };
+const heroImageAsset = { url: "/img/hero/hero-collaboration.webp" };
 
 export function Hero() {
   return (
