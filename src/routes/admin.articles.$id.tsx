@@ -262,6 +262,55 @@ function ArticleEditor() {
             )}
           </div>
 
+          {/* Author block */}
+          <details className="rounded-xl border border-border bg-card/40 p-4" open>
+            <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-muted-foreground">Author</summary>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <label className="block">
+                <span className="text-xs text-muted-foreground">Author name</span>
+                <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} placeholder="e.g. Hamwenda Mwando" maxLength={120} className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm" />
+              </label>
+              <label className="block">
+                <span className="text-xs text-muted-foreground">Role / title</span>
+                <input value={authorTitle} onChange={(e) => setAuthorTitle(e.target.value)} placeholder="e.g. Lead Systems Engineer" maxLength={120} className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm" />
+              </label>
+              <label className="block sm:col-span-2">
+                <span className="text-xs text-muted-foreground">Short bio <span className="text-[10px]">(≤400 chars)</span></span>
+                <textarea value={authorBio} onChange={(e) => setAuthorBio(e.target.value)} rows={3} maxLength={400} placeholder="One-paragraph bio shown at the end of the article." className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm" />
+                <span className="text-[10px] text-muted-foreground">{authorBio.length}/400</span>
+              </label>
+              <div className="sm:col-span-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-xs text-muted-foreground">Avatar</span>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const f = e.target.files?.[0];
+                      e.target.value = "";
+                      if (!f) return;
+                      setUploading(true);
+                      const url = await uploadToBucket(f);
+                      setUploading(false);
+                      if (url) {
+                        setAuthorAvatarUrl(url);
+                        toast.success("Avatar uploaded");
+                      }
+                    }}
+                  />
+                  <button type="button" onClick={() => avatarInputRef.current?.click()} disabled={uploading} className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-accent disabled:opacity-60">
+                    <Upload className="h-3.5 w-3.5" /> Upload avatar
+                  </button>
+                  <input value={authorAvatarUrl} onChange={(e) => setAuthorAvatarUrl(e.target.value)} placeholder="https://…" className="flex-1 min-w-[200px] rounded-md border border-border bg-background px-3 py-2 text-sm" />
+                  {authorAvatarUrl && <img src={authorAvatarUrl} alt="Author preview" className="h-10 w-10 rounded-full border border-border object-cover" />}
+                </div>
+              </div>
+            </div>
+          </details>
+
+
           {/* SEO block */}
           <details className="rounded-xl border border-border bg-card/40 p-4" open>
             <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-muted-foreground">SEO &amp; social preview</summary>
