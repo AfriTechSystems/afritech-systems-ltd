@@ -198,7 +198,7 @@ function AdminPage() {
   }
 
   function exportLeadsCsv(leads: Lead[]) {
-    const headers = ["created_at", "name", "company", "email", "bottleneck", "help", "engine", "metric", "message", "source"];
+    const headers = ["created_at", "name", "company", "email", "engine", "metric", "bottleneck", "help", "message", "source"];
     const rows = leads.map((l) =>
       headers.map((h) => `"${String((l as unknown as Record<string, unknown>)[h] ?? "").replace(/"/g, '""')}"`).join(","),
     );
