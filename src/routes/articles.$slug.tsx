@@ -19,12 +19,16 @@ interface ArticleFull {
   og_image: string | null;
   tags: string[];
   published_at: string | null;
+  author_name: string | null;
+  author_title: string | null;
+  author_bio: string | null;
+  author_avatar_url: string | null;
 }
 
 async function fetchArticle(slug: string): Promise<ArticleFull | null> {
   const { data, error } = await supabase
     .from("articles")
-    .select("id, slug, title, excerpt, body_md, cover_url, cover_alt, seo_title, seo_description, og_image, tags, published_at, published")
+    .select("id, slug, title, excerpt, body_md, cover_url, cover_alt, seo_title, seo_description, og_image, tags, published_at, published, author_name, author_title, author_bio, author_avatar_url")
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
